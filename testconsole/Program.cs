@@ -9,11 +9,18 @@ namespace testconsole
         {
             var apiClient = new ApiClient();
 
-            var newItemId = await apiClient.CreateItem(new TodoItemDTO { Name = "BOB", IsComplete = true });
-            Console.WriteLine($"New Item Id: {newItemId}");
+            try
+            {
+                var newItemId = await apiClient.CreateItem(new TodoItemDTO { Name = "BOB", IsComplete = true });
+                Console.WriteLine($"New Item Id: {newItemId}");
 
-            var newItem = await apiClient.GetItem(newItemId);
-            Console.WriteLine($"New Item: {newItem}");
+                var newItem = await apiClient.GetItem(newItemId);
+                Console.WriteLine($"New Item: {newItem}");
+
+            } catch(Exception e)
+            {
+                Console.WriteLine($"Problem: {e.Message}");
+            }
 
             var items = await apiClient.GetItems();
 

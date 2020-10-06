@@ -21,8 +21,18 @@ namespace testwebapi
 
         public async Task Invoke(HttpContext context)
         {
-            logger.LogCritical("HELLO REQUEST");
-            await next(context);
+            try
+            {
+                await next(context);
+            }
+            finally
+            {
+                logger.LogInformation(
+                    "Request {method} {url} => {statusCode}",
+                    context.Request?.Method,
+                    context.Request?.Path.Value,
+                    context.Response?.StatusCode);
+            }
         }
     }
 

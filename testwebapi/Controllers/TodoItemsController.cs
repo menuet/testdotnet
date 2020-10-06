@@ -108,6 +108,7 @@ namespace testwebapi.Controllers
             await _context.SaveChangesAsync();
 
             // return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
+            todoItemDTO.Id = todoItem.Id;
             return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItemDTO);
         }
 
