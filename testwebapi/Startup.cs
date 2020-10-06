@@ -50,6 +50,8 @@ namespace testwebapi
             {
                 endpoints.MapControllers();
             });
+
+            app.UseMiddleware<RequestLoggingMiddleware>();
         }
     }
 }
