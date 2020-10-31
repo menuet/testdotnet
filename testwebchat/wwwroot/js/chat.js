@@ -11,6 +11,10 @@ connection.on("ReceiveMessage", function (user, message) {
     var li = document.createElement("li");
     li.textContent = encodedMsg;
     document.getElementById("messagesList").appendChild(li);
+    var canvas = document.getElementById("myGrid");
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#FF0000";
+    ctx.fillRect(0, 0, 150, 75);
 });
 
 connection.start().then(function () {
@@ -26,4 +30,9 @@ document.getElementById("sendButton").addEventListener("click", function (event)
         return console.error(err.toString());
     });
     event.preventDefault();
+});
+
+document.getElementById("myGrid").addEventListener("click", function (event) {
+    console.info("YEAH");
+    document.getElementById("messageInput").value = "clicked";
 });
