@@ -32,9 +32,9 @@ ol, ul {
     width: 34px;
 }
 
-    .square:focus {
-        outline: none;
-    }
+.square:focus {
+    outline: none;
+}
 
 .kbd-navigation .square:focus {
     background: #ddd;
@@ -49,6 +49,6 @@ ol, ul {
     margin-left: 20px;
 }
 
-.selected-step {
-    font-weight: bold;
+.selected-boat {
+    background: #f00;
 }

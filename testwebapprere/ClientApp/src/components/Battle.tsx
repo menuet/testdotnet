@@ -15,12 +15,15 @@ function createGridPanel(props: Readonly<BattleProps>): any {
     for (let y = 0; y < props.grid.size; ++y) {
         const cells = [];
         for (let x = 0; x < props.grid.size; ++x) {
+            const boatPos = BattleStore.hitBoat(props.grid, { x: x, y: y });
+            const className = "square" + (boatPos === props.selectedBoat && props.selectedBoat !== undefined ? " selected-boat" : "");
             cells.push(
                 <button
-                    className="square"
+                    className={className}
                     key={x}
+                    onClick={() => props.hit({x:x, y:y})}
                 >
-                    {BattleStore.isHittingBoat(props.grid, { x: x, y: y }) ? 'O' : ''}
+                    {boatPos !== undefined ? 'O' : ''}
                 </button>
             );
         }

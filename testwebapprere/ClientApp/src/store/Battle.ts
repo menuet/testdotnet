@@ -28,7 +28,7 @@ export type Grid = {
 }
 
 export enum Status {
-    Pending,
+    Positioning,
     Draw,
     Win,
 }
@@ -36,7 +36,7 @@ export enum Status {
 export interface BattleState {
     grid: Grid;
     status: Status;
-    selectedBoat: Boat | undefined;
+    selectedBoat: BoatPosition | undefined;
 }
 
 function isHittingTheBoat(boatPos: BoatPosition, location: Location): boolean {
@@ -49,8 +49,8 @@ function isHittingTheBoat(boatPos: BoatPosition, location: Location): boolean {
         location.y < boatPos.location.y + boatPos.boat.size;
 }
 
-export function isHittingBoat(grid: Grid, location: Location): boolean {
-    return grid.boatsPositions.findIndex((boatPos) => isHittingTheBoat(boatPos, location)) >= 0;
+export function hitBoat(grid: Grid, location: Location): BoatPosition | undefined {
+    return grid.boatsPositions.find((boatPos) => isHittingTheBoat(boatPos, location));
 }
 
 function createBoats(): Boat[] {
@@ -105,13 +105,13 @@ export const actionCreators = {
 
 export const reducer: Reducer<BattleState> = (state: BattleState | undefined, incomingAction: Action): BattleState => {
     if (state === undefined) {
-        return { grid: createGrid(10), status: Status.Pending, selectedBoat: undefined };
+        return { grid: createGrid(10), status: Status.Positioning, selectedBoat: undefined };
     }
 
     const action = incomingAction as KnownAction;
     switch (action.type) {
         case 'BATTLE_HIT':
-            return state;
+            return { grid: state.grid, status: state.status, selectedBoat: hitBoat(state.grid, action.location)};
         case 'BATTLE_SELECT_BOAT':
             return state;
         default:
