@@ -25,7 +25,7 @@ export enum Status {
     Win,
 }
 
-export interface TictactoeState {
+export interface BattleState {
     grid: Grid;
     nextIs: Hit;
     status: Status;
@@ -39,7 +39,7 @@ function createGrid(size: number): Grid {
     return grid;
 }
 
-function hitGrid(state: TictactoeState, location: Location): TictactoeState {
+function hitGrid(state: BattleState, location: Location): BattleState {
     if (state.status !== Status.Pending)
         return state;
     const previous_hit = state.grid.rows[location.y].cells[location.x];
@@ -118,7 +118,7 @@ function computeStatus(hit: Hit, grid: Grid, location: Location): Status {
 // They do not themselves have any side-effects; they just describe something that is going to happen.
 // Use @typeName and isActionType for type detection that works even after serialization/deserialization.
 
-export interface HitAction { type: 'TICTACTOE_HIT', location : Location }
+export interface HitAction { type: 'BATTLE_HIT', location : Location }
 
 // Declare a 'discriminated union' type. This guarantees that all references to 'type' properties contain one of the
 // declared type strings (and not any other arbitrary string).
@@ -129,20 +129,20 @@ export type KnownAction = HitAction;
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
 export const actionCreators = {
-    hit: (location: Location) => ({ type: 'TICTACTOE_HIT', location : location } as HitAction)
+    hit: (location: Location) => ({ type: 'BATTLE_HIT', location : location } as HitAction)
 };
 
 // ----------------
 // REDUCER - For a given state and action, returns the new state. To support time travel, this must not mutate the old state.
 
-export const reducer: Reducer<TictactoeState> = (state: TictactoeState | undefined, incomingAction: Action): TictactoeState => {
+export const reducer: Reducer<BattleState> = (state: BattleState | undefined, incomingAction: Action): BattleState => {
     if (state === undefined) {
-        return { grid: createGrid(3), nextIs: Hit.X, status: Status.Pending };
+        return { grid: createGrid(10), nextIs: Hit.X, status: Status.Pending };
     }
 
     const action = incomingAction as KnownAction;
     switch (action.type) {
-        case 'TICTACTOE_HIT':
+        case 'BATTLE_HIT':
             return hitGrid(state, action.location);
         default:
             return state;
