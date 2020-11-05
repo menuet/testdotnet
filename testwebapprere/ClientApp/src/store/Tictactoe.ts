@@ -72,7 +72,7 @@ function isColWin(hit: Hit, grid: Grid, location: Location): boolean {
 }
 
 function isDiagDescending(hit: Hit, grid: Grid, location: Location): boolean {
-    if (location.x != location.y)
+    if (location.x !== location.y)
         return false;
     for (let i = 0; i < grid.size; ++i)
         if (grid.rows[i].cells[i] !== hit)
@@ -81,7 +81,7 @@ function isDiagDescending(hit: Hit, grid: Grid, location: Location): boolean {
 }
 
 function isDiagAscending(hit: Hit, grid: Grid, location: Location): boolean {
-    if (location.x != grid.size - 1 - location.y)
+    if (location.x !== grid.size - 1 - location.y)
         return false;
     for (let i = 0; i < grid.size; ++i)
         if (grid.rows[grid.size - 1 - i].cells[i] !== hit)
@@ -92,7 +92,7 @@ function isDiagAscending(hit: Hit, grid: Grid, location: Location): boolean {
 function isFull(grid: Grid): boolean {
     for (let y = 0; y < grid.rows.length; ++y) {
         for (let x = 0; x < grid.rows.length; ++x) {
-            if (grid.rows[y].cells[x] == undefined)
+            if (grid.rows[y].cells[x] === undefined)
                 return false;
         }
     }

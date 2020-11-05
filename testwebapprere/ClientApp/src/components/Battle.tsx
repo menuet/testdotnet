@@ -10,49 +10,47 @@ type BattleProps =
     typeof BattleStore.actionCreators &
     RouteComponentProps<{}>;
 
-function hitText(hit: BattleStore.Hit | undefined): string {
-    switch (hit) {
-        case undefined:
-            return '';
-        case BattleStore.Hit.X:
-            return 'X';
-        case BattleStore.Hit.O:
-            return 'O';
+function createGridPanel(props: Readonly<BattleProps>): any {
+    const rows = [];
+    for (let y = 0; y < props.grid.size; ++y) {
+        const cells = [];
+        for (let x = 0; x < props.grid.size; ++x) {
+            cells.push(
+                <button
+                    className="square"
+                    key={x}
+                >
+                    {BattleStore.isHittingBoat(props.grid, { x: x, y: y }) ? 'O' : ''}
+                </button>
+            );
+        }
+        rows.push(<div className="board-row" key={y}>{cells}</div>);
     }
+    return <div className="game-board">{rows}</div>
 }
 
-function statusText(status: BattleStore.Status, nextIs: BattleStore.Hit): string {
-    switch (status) {
-        case BattleStore.Status.Pending: return "Next is " + (nextIs === BattleStore.Hit.X ? 'X' : 'O');
-        case BattleStore.Status.Draw: return "Draw";
-        case BattleStore.Status.Win: return "Winner is " + (nextIs === BattleStore.Hit.X ? 'O' : 'X');
-    }
+function createBoatsPanel(props: Readonly<BattleProps>): any {
+    //const remainingBoats = this.props.grid.boats.filter((boat) => boat.location === undefined).map((boat) => {
+    //    return (
+    //        <button className="square"
+    //            key={boat.name}
+    //            onClick={() => this.props.selectBoat(boat)}
+    //        >
+    //            {boat.name}
+    //        </button>
+    //    );
+    //});
+    return <div className="game-info"></div>
 }
 
 class Battle extends React.PureComponent<BattleProps> {
     public render() {
-        const rows = this.props.grid.rows.map((row, rowIndex) => {
-            const cells = row.cells.map((hit, cellIndex) => {
-                return (
-                    <button
-                        className="square"
-                        key={cellIndex}
-                        onClick={() => this.props.hit({ x: cellIndex, y: rowIndex })}
-                    >
-                        {hitText(hit)}
-                    </button>
-                );
-            });
-            return (
-                <div className="board-row" key={rowIndex}>{cells}</div>
-            );
-        });
         return (
             <React.Fragment>
                 <h1>BATTLE</h1>
                 <div className="game">
-                    <div className="game-board">{rows}</div>
-                    <div className="game-info">Status: {statusText(this.props.status, this.props.nextIs)}</div>
+                    {createGridPanel(this.props)}
+                    {createBoatsPanel(this.props)}
                 </div>
             </React.Fragment>
         );
