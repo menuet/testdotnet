@@ -21,7 +21,7 @@ function createGridPanel(props: Readonly<BattleProps>): any {
                 <button
                     className={className}
                     key={x}
-                    onClick={() => props.hit({x:x, y:y})}
+                    onClick={(e) => props.hit(e, {x:x, y:y})}
                 >
                     {boatPos !== undefined ? 'O' : ''}
                 </button>

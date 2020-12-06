@@ -85,7 +85,7 @@ function createGrid(size: number): Grid {
 // Use @typeName and isActionType for type detection that works even after serialization/deserialization.
 
 export interface SelectBoatAction { type: 'BATTLE_SELECT_BOAT', boat: Boat }
-export interface HitAction { type: 'BATTLE_HIT', location: Location }
+export interface HitAction { type: 'BATTLE_HIT', e: React.MouseEvent<HTMLElement>, location: Location }
 
 // Declare a 'discriminated union' type. This guarantees that all references to 'type' properties contain one of the
 // declared type strings (and not any other arbitrary string).
@@ -97,11 +97,49 @@ export type KnownAction = SelectBoatAction | HitAction;
 
 export const actionCreators = {
     selectBoat: (boat: Boat) => ({ type: 'BATTLE_SELECT_BOAT', boat: boat } as SelectBoatAction),
-    hit: (location: Location) => ({ type: 'BATTLE_HIT', location: location } as HitAction),
+    hit: (e: React.MouseEvent<HTMLElement>, location: Location) => ({ type: 'BATTLE_HIT', e: e, location: location } as HitAction),
 };
 
 // ----------------
 // REDUCER - For a given state and action, returns the new state. To support time travel, this must not mutate the old state.
+
+function battleHit(state: BattleState, action: HitAction): BattleState {
+    if (action.e.ctrlKey) {
+        if (!state.selectedBoat)
+            return state;
+        const grid: Grid = {
+            boats: state.grid.boats,
+            boatsPositions: state.grid.boatsPositions.filter((boatPosition) => boatPosition !== state.selectedBoat),
+            size: state.grid.size,
+        };
+        const selectedBoatPosition: BoatPosition = {
+            boat: state.selectedBoat.boat,
+            location: action.location,
+            orientation: state.selectedBoat.orientation,
+        };
+        grid.boatsPositions.push(selectedBoatPosition);
+        return { grid: grid, status: state.status, selectedBoat: selectedBoatPosition };
+    }
+
+    if (action.e.shiftKey) {
+        if (!state.selectedBoat)
+            return state;
+        const grid: Grid = {
+            boats: state.grid.boats,
+            boatsPositions: state.grid.boatsPositions.filter((boatPosition) => boatPosition !== state.selectedBoat),
+            size: state.grid.size,
+        };
+        const selectedBoatPosition: BoatPosition = {
+            boat: state.selectedBoat.boat,
+            location: state.selectedBoat.location,
+            orientation: state.selectedBoat.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal,
+        };
+        grid.boatsPositions.push(selectedBoatPosition);
+        return { grid: grid, status: state.status, selectedBoat: selectedBoatPosition };
+    }
+
+    return { grid: state.grid, status: state.status, selectedBoat: hitBoat(state.grid, action.location) };
+}
 
 export const reducer: Reducer<BattleState> = (state: BattleState | undefined, incomingAction: Action): BattleState => {
     if (state === undefined) {
@@ -111,7 +149,7 @@ export const reducer: Reducer<BattleState> = (state: BattleState | undefined, in
     const action = incomingAction as KnownAction;
     switch (action.type) {
         case 'BATTLE_HIT':
-            return { grid: state.grid, status: state.status, selectedBoat: hitBoat(state.grid, action.location)};
+            return battleHit(state, action);
         case 'BATTLE_SELECT_BOAT':
             return state;
         default:
