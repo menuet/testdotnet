@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  <PropertyGroup>
+
+    <NubootPropSourcePath Condition="'$(NubootPropSourcePath)' == ''">$(MSBuildThisFileDirectory)</NubootPropSourcePath>
+
+    <NubootPropUnzipPath Condition="'$(NubootPropUnzipPath)' == ''"></NubootPropUnzipPath>
+
+    <NubootPropSamiUrl Condition="'$(NubootPropSamiUrl)' == ''">http://bams-emea-sami-api.int.thomsonreuters.com/artifactory/default.generic.local/erds</NubootPropSamiUrl>
+
+    <NubootPropPackagesUrl Condition="'$(NubootPropPackagesUrl)' == ''">$(NubootPropSamiUrl)/misc</NubootPropPackagesUrl>
+
+    <NubootPropSamiUsername Condition="'$(NubootPropSamiUsername)' == ''">-s.robot.pixl</NubootPropSamiUsername>
+
+    <NubootPropSamiPassword Condition="'$(NubootPropSamiPassword)' == ''">Turnips201110</NubootPropSamiPassword>
+
+    <NubootPropPackagesCachePath Condition="'$(NubootPropPackagesCachePath)' == ''"></NubootPropPackagesCachePath>
+
+    <NubootPropPackagesInstallPath Condition="'$(NubootPropPackagesInstallPath)' == ''"></NubootPropPackagesInstallPath>
+
+    <NubootPropToolsCurlPath Condition="'$(NubootPropToolsCurlPath)' == ''">$(NubootPropUnzipPath)\build\native\tools\curl\7.39</NubootPropToolsCurlPath>
+
+    <NubootPropToolsNugetPath Condition="'$(NubootPropToolsNugetPath)' == ''">$(NubootPropUnzipPath)\build\native\tools\nuget\2.8</NubootPropToolsNugetPath>
+
+    <NubootPropNubuPackageVersion Condition="'$(NubootPropNubuPackageVersion)' == ''">1.1.0.4</NubootPropNubuPackageVersion>
+
+    <NubootPropNubuPackageIdVersion Condition="'$(NubootPropNubuPackageIdVersion)' == ''">nubu.$(NubootPropNubuPackageVersion)</NubootPropNubuPackageIdVersion>
+
+    <NubootPropNubuPackageCachePath Condition="'$(NubootPropNubuPackageCachePath)' == ''">$(NubootPropPackagesCachePath)\$(NubootPropNubuPackageIdVersion).nupkg</NubootPropNubuPackageCachePath>
+
+    <NubootPropNubuPackageInstallPath Condition="'$(NubootPropNubuPackageInstallPath)' == ''">$(NubootPropPackagesInstallPath)\$(NubootPropNubuPackageIdVersion)</NubootPropNubuPackageInstallPath>
+
+    <NubootPropNubuPackageAlreadyCached>false</NubootPropNubuPackageAlreadyCached>
+    <NubootPropNubuPackageAlreadyCached Condition="Exists('$(NubootPropNubuPackageCachePath)')">true</NubootPropNubuPackageAlreadyCached>
+
+    <NubootPropNubuPackageAlreadyInstalled>false</NubootPropNubuPackageAlreadyInstalled>
+    <NubootPropNubuPackageAlreadyInstalled Condition="Exists('$(NubootPropNubuPackageInstallPath)')">true</NubootPropNubuPackageAlreadyInstalled>
+
+    <NubootPropProfileName Condition="'$(NubootPropProfileName)' == ''"></NubootPropProfileName>
+
+    <NubootPropNugetPackagesList Condition="'$(NubootPropNugetPackagesList)' == ''"></NubootPropNugetPackagesList>
+
+    <NubootPropNugetSourcesList Condition="'$(NubootPropNugetSourcesList)' == ''">[etc!http://bams-emea-sami-api.int.thomsonreuters.com/artifactory/default.generic.local/erds/misc!sami]</NubootPropNugetSourcesList>
+
+    <NubootPropMSBuildPropsPath Condition="'$(NubootPropMSBuildPropsPath)' == ''">$(MSBuildThisFileDirectory)</NubootPropMSBuildPropsPath>
+
+  </PropertyGroup>
+
+
+  <Target Name="NubootTargetUnzipNuboot">
+
+    <Message
+      Text="Unzipping Nuboot.exe from $(NubootPropSourcePath) into $(NubootPropUnzipPath)"
+      Condition="!Exists('$(NubootPropUnzipPath)')"
+      />
+
+    <Message
+      Text="Nuboot.exe already unzipped in $(NubootPropUnzipPath)"
+      Condition="Exists('$(NubootPropUnzipPath)')"
+      />
+
+    <Exec
+      Command="&quot;$(NubootPropSourcePath)\nuboot.exe&quot; x &quot;-o$(NubootPropUnzipPath)&quot;"
+      Condition="!Exists('$(NubootPropUnzipPath)')"
+      />
+
+  </Target>
+
+
+  <Target Name="NubootTargetDownloadInstallNubu">
+
+    <Message
+      Text="Package $(NubootPropNubuPackageIdVersion) already installed in $(NubootPropPackagesInstallPath)"
+      Condition="$(NubootPropNubuPackageAlreadyInstalled)"
+      />
+
+    <MakeDir
+      Directories="$(NubootPropPackagesCachePath)"
+      Condition="!$(NubootPropNubuPackageAlreadyInstalled) and !$(NubootPropNubuPackageAlreadyCached) and !Exists('$(NubootPropPackagesCachePath)')"
+      />
+
+    <Message
+      Text="Downloading and caching package $(NubootPropNubuPackageIdVersion) from $(NubootPropPackagesUrl) into $(NubootPropPackagesCachePath)"
+      Condition="!$(NubootPropNubuPackageAlreadyInstalled) and !$(NubootPropNubuPackageAlreadyCached)"
+      />
+
+    <PropertyGroup>
+      <_NubootPropCurlCommand>"$(NubootPropToolsCurlPath)\curl.exe"</_NubootPropCurlCommand>
+      <_NubootPropCurlCommand>$(_NubootPropCurlCommand) --retry 5 --retry-delay 15 -u "$(NubuPropSvnUsername):$(NubuPropSvnPassword)"</_NubootPropCurlCommand>
+      <_NubootPropCurlCommand>$(_NubootPropCurlCommand) -o "$(NubootPropNubuPackageCachePath)"</_NubootPropCurlCommand>
+      <_NubootPropCurlCommand>$(_NubootPropCurlCommand) "$(NubootPropPackagesUrl)/$(NubootPropNubuPackageIdVersion).nupkg"</_NubootPropCurlCommand>
+    </PropertyGroup>
+
+    <Exec
+      Command="$(_NubootPropCurlCommand)"
+      Condition="!$(NubootPropNubuPackageAlreadyInstalled) and !$(NubootPropNubuPackageAlreadyCached)"
+      />
+
+    <Message
+      Text="Installing package $(NubootPropNubuPackageIdVersion) from $(NubootPropNubuPackageCachePath) into $(NubootPropPackagesInstallPath)"
+      Condition="!$(NubootPropNubuPackageAlreadyInstalled)"
+      />
+
+    <Exec
+      Command="&quot;$(NubootPropToolsNugetPath)\nuget.exe&quot; install &quot;nubu&quot; -NoCache -Version &quot;$(NubootPropNubuPackageVersion)&quot; -Source &quot;$(NubootPropPackagesCachePath)&quot; -OutputDirectory &quot;$(NubootPropPackagesInstallPath)&quot;"
+      Condition="!$(NubootPropNubuPackageAlreadyInstalled)"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="NubootTargetDownloadInstallNugetPackages"
+    >
+
+    <ItemGroup>
+      <_NubootItemInstallNugetPackagesProperties Include="NubuPropProfileName=$(NubootPropProfileName)" />
+      <_NubootItemInstallNugetPackagesProperties Include="NubuPropNugetPackagesCachePath=$(NubootPropPackagesCachePath)" />
+      <_NubootItemInstallNugetPackagesProperties Include="NubuPropNugetPackagesInstallPath=$(NubootPropPackagesInstallPath)" />
+      <_NubootItemInstallNugetPackagesProperties Include="NubuPropNugetPackagesList=$(NubootPropNugetPackagesList)" />
+      <_NubootItemInstallNugetPackagesProperties Include="NubuPropNugetSourcesList=$(NubootPropNugetSourcesList)" />
+      <_NubootItemInstallNugetPackagesProperties Include="NubuPropMsbuildPropsPath=$(NubootPropMSBuildPropsPath)" />
+    </ItemGroup>
+
+    <MSBuild
+      Projects="$(NubootPropNubuPackageInstallPath)\build\native\msbuild\nubu.proj"
+      Targets="NubuTargetInstallNugetPackages;NubuTargetGenerateMsbuildProps"
+      Properties="@(_NubootItemInstallNugetPackagesProperties)"
+      />
+
+  </Target>
+
+
+</Project>

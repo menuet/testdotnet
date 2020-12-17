@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuPropUseAllNugetPackages Condition="'$(NubuPropUseAllNugetPackages)' == ''">false</NubuPropUseAllNugetPackages>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.variants.props" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.boost.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[boost]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.boost.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.eikan.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[eikan]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.eikan.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.eikon_sdk_dependencies.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[eikon_sdk_dependencies]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.eikon_sdk_dependencies.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.expression_blend_sdk.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[expression_blend_sdk]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.expression_blend_sdk.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.googlemock.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[googlemock]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.googlemock.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.gsl.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[gsl]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.gsl.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.newtonsoft_json.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[newtonsoft_json]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.newtonsoft_json.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.nubu.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[nubu]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.nubu.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.oxyplot_core.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[oxyplot_core]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.oxyplot_core.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.oxyplot_wpf.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[oxyplot_wpf]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.oxyplot_wpf.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.pugixml.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[pugixml]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.pugixml.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.python.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[python]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.python.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.rapidjson.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[rapidjson]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.rapidjson.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.rfa.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[rfa]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.rfa.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.thomsonreuters_desktop_sdk_ui_signed.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[thomsonreuters_desktop_sdk_ui_signed]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.thomsonreuters_desktop_sdk_ui_signed.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.tibcoems.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[tibcoems]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.tibcoems.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.trek.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[trek]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.trek.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)Nubu.NugetPackage.xerces.props" Condition="($(NubuPropUseAllNugetPackages) or $(NubuPropUseNugetPackages.Contains('[xerces]'))) and Exists('$(MSBuildThisFileDirectory)Nubu.NugetPackage.xerces.props')" />
+</Project>

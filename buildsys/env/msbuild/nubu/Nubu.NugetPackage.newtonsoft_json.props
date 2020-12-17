@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_newtonsoft_json_NugetPackageId>Newtonsoft.Json</NubuProp_newtonsoft_json_NugetPackageId>
+    <NubuProp_newtonsoft_json_NugetPackageVersion>6.0.3</NubuProp_newtonsoft_json_NugetPackageVersion>
+    <NubuProp_newtonsoft_json_NugetPackageDllsPath>$(NubuPropNugetPackagesInstallPath)\$(NubuProp_newtonsoft_json_NugetPackageId).$(NubuProp_newtonsoft_json_NugetPackageVersion)\lib\net40</NubuProp_newtonsoft_json_NugetPackageDllsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(NubuProp_newtonsoft_json_NugetPackageDllsPath)\Newtonsoft.Json.dll" />
+  </ItemGroup>
+</Project>

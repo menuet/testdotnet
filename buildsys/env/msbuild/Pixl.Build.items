@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemGroup>
+    <PixlItemPathsToClean Include="$(PixlPropOutputPath)" />
+
+    <PixlItemPathsToClean Include="$(PixlPropSourcePath)\ipch" />
+
+    <PixlItemFilesToClean Include="$(PixlPropSourcePath)\**\file_version_info.h" />
+    <PixlItemFilesToClean Include="$(PixlPropSourceFuncTestsPath)\Framework\CppSolution\PyPIXL\Module\PyPIXL*.inc" />
+    <PixlItemFilesToClean Include="$(PixlPropSourceFuncTestsPath)\Framework\CppSolution\PyPIXL\Module\PyPIXL*_versions.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemPerfTestsFrameworkScripts Include="$(PixlPropSourcePerfTestsPath)\scripts\python\**\*.py">
+    <CopyToTestSuites>false</CopyToTestSuites>
+    </PixlItemPerfTestsFrameworkScripts>
+    <PixlItemPerfTestsFrameworkScripts Include="$(PixlPropSourceFuncTestsCommonScriptsPath)\LoggingConfig.py">
+      <CopyToTestSuites>true</CopyToTestSuites>
+    </PixlItemPerfTestsFrameworkScripts>
+    <PixlItemPerfTestsFrameworkScripts Include="$(PixlPropSourceFuncTestsPath)\AutoPerfTests\RunAllPerfTests.py">
+      <CopyToTestSuites>true</CopyToTestSuites>
+    </PixlItemPerfTestsFrameworkScripts>
+    <PixlItemPerfTestsFrameworkScripts Include="$(PixlPropSourceFuncTestsPath)\AutoPerfTests\RunAllPerfTests.css">
+      <CopyToTestSuites>true</CopyToTestSuites>
+    </PixlItemPerfTestsFrameworkScripts>
+    <PixlItemPerfTestsFrameworkScripts Include="$(PixlPropSourceFuncTestsPath)\AutoPerfTests\RunAllPerfTestsConfig.xml">
+      <CopyToTestSuites>true</CopyToTestSuites>
+    </PixlItemPerfTestsFrameworkScripts>
+    <PixlItemPerfTestsFrameworkScripts Include="$(PixlPropSourceFuncTestsPath)\AutoPerfTests\perf-test-results.xsl">
+        <CopyToTestSuites>true</CopyToTestSuites>
+    </PixlItemPerfTestsFrameworkScripts>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemConfigurations Include="Debug" />
+    <PixlItemConfigurations Include="Opt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemSourcePackagingFiles Include="$(PixlPropEnvPath)\packaging\$(PixlPropPlatformToolsetLabel)\*.rsm">
+      <DestinationFolder>$(PixlPropOutputPackagingPath)</DestinationFolder>
+    </PixlItemSourcePackagingFiles>
+    <PixlItemSourcePackagingFiles Include="$(PixlPropEnvConfigPath)\fieldmapping.xml">
+      <DestinationFolder>$(PixlPropOutputPackagingPath)\$(PixlPropExportPackagingConfigFolder)</DestinationFolder>
+    </PixlItemSourcePackagingFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemPublishDirectories Include="$(PixlPropOutputPkgPath)\packaging">
+      <DestinationFolder>packaging</DestinationFolder>
+    </PixlItemPublishDirectories>
+    <PixlItemPublishDirectories Include="$(PixlPropOutputPkgPath)\PIXL">
+      <DestinationFolder>PIXL</DestinationFolder>
+    </PixlItemPublishDirectories>
+    <PixlItemPublishDirectories Include="$(PixlPropOutputRunPath)">
+      <DestinationFolder>run</DestinationFolder>
+    </PixlItemPublishDirectories>
+    <PixlItemPublishDirectories Include="$(PixlPropEnvMsbuildPath)">
+      <DestinationFolder>sources\msbuild</DestinationFolder>
+    </PixlItemPublishDirectories>
+    <PixlItemPublishDirectories Include="$(PixlPropSourceCorePath)">
+      <DestinationFolder>sources\core</DestinationFolder>
+    </PixlItemPublishDirectories>
+    <PixlItemPublishDirectories Include="$(PixlPropSourceSamplesPath)">
+      <DestinationFolder>sources\samples</DestinationFolder>
+    </PixlItemPublishDirectories>
+    <PixlItemPublishDirectories Include="$(PixlPropSourceSharedPath)">
+      <DestinationFolder>sources\shared</DestinationFolder>
+    </PixlItemPublishDirectories>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemExportSamplesPaths Include="$(PixlPropEnvConfigPath)">
+      <DestinationFolder>$(PixlPropOutputRunPath)</DestinationFolder>
+    </PixlItemExportSamplesPaths>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)\Gallery" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)\Gallery\Files" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)-Symbols" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)-Symbols\Gallery" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)-Symbols\Gallery\Symbols-Files" Condition="'$(PixlPropPlatform)' != 'x64'" />
+    <PixlItemWixSubDirs Include="$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)-Symbols\Gallery\Symbols-Files_x64" Condition="'$(PixlPropPlatform)' == 'x64'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixlItemNativeAppAttributes Include="App">
+      <Action>AddElement</Action>
+      <Element>App</Element>
+      <ParentElement>/NativeApps</ParentElement>
+      <Value>$(PixlPropPixlProtocolName)</Value>
+    </PixlItemNativeAppAttributes>
+    <PixlItemNativeAppAttributes Include="AppId">
+      <Action>AddAttribute</Action>
+      <Element>/NativeApps/App</Element>
+      <Key>%(Identity)</Key>
+      <Value>$(PixlPropPixlProtocolName)</Value>
+    </PixlItemNativeAppAttributes>
+    <PixlItemNativeAppAttributes Include="ServiceName">
+      <Action>AddAttribute</Action>
+      <Element>/NativeApps/App</Element>
+      <Key>%(Identity)</Key>
+      <Value>$(PixlPropPixlProtocolName)</Value>
+    </PixlItemNativeAppAttributes>
+    <PixlItemNativeAppAttributes Include="Version">
+      <Action>AddAttribute</Action>
+      <Element>/NativeApps/App</Element>
+      <Key>%(Identity)</Key>
+      <Value>$(PixlPropPixlProtocolVersion)</Value>
+    </PixlItemNativeAppAttributes>
+    <PixlItemNativeAppAttributes Include="Preinstalled">
+      <Action>AddAttribute</Action>
+      <Element>/NativeApps/App</Element>
+      <Key>%(Identity)</Key>
+      <Value>true</Value>
+    </PixlItemNativeAppAttributes>
+    <PixlItemNativeAppAttributes Include="LeaveInBin">
+      <Action>AddAttribute</Action>
+      <Element>/NativeApps/App</Element>
+      <Key>%(Identity)</Key>
+      <Value>true</Value>
+    </PixlItemNativeAppAttributes>
+  </ItemGroup>
+
+</Project>

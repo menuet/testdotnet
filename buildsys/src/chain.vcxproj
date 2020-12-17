@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Configurations -->
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Opt|Win32">
+      <Configuration>Opt</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Opt|x64">
+      <Configuration>Opt</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <!-- Project global properties -->
+  <PropertyGroup Label="Globals">
+    <ProjectName>chain</ProjectName>
+    <ProjectGuid>{A0935916-E0A8-465A-867C-2656642B7D78}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <PixlPropProjectCategory>Core</PixlPropProjectCategory>
+    <NubuPropUseNugetPackages>[eikan]</NubuPropUseNugetPackages>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <!-- Project common properties -->
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Pixl.Cpp.proj))\Pixl.Cpp.proj" />
+  <!-- Project specific properties -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>
+      Effix_Infra_HAS_NEW_IOSTREAMS;
+      TSA_BEHAVIOUR;
+      BUILDING_pixl_chain28;
+      _PIXLDLL;
+      _TEMPLATES_ENABLE_;
+      PIXL_GENERIC_TIB;
+      PIXL_CHAIN_BUILD_;
+      %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <!-- Project files -->
+  <ItemGroup>
+    <ClInclude Include="chain_export.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="chain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\chainmgr\chainmgr.vcxproj">
+      <Project>{3961de9a-6636-4d2d-a9a1-f78707e56083}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\context\context.vcxproj">
+      <Project>{0dfad172-e6dd-4445-922d-bc520f03d10f}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

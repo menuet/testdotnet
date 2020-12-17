@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Configuration of Visual Studio General Properties -->
+  <PropertyGroup>
+
+    <LinkIncremental>false</LinkIncremental>
+
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+
+    <!-- Configuration of Visual Studio C++ Compiler -->
+    <ClCompile>
+      <PreprocessorDefinitions>
+        _DEBUG;
+        DEBUG;
+        PIXL_CONFIG_DEBUG_SLOW_ASSERTIONS_LEVEL=$(PixlPropDebugSlowAssertionsLevel);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropDebugSecureSCL)' != ''">
+        _SECURE_SCL=$(PixlPropDebugSecureSCL);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropDebugHasIteratorDebugging)' != ''">
+        _HAS_ITERATOR_DEBUGGING=$(PixlPropDebugHasIteratorDebugging);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropDebugIteratorDebugLevel)' != ''">
+        _ITERATOR_DEBUG_LEVEL=$(PixlPropDebugIteratorDebugLevel);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+
+    <!-- Configuration of Visual Studio Linker -->
+    <Link>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <StripPrivateSymbols></StripPrivateSymbols>
+    </Link>
+
+    <!-- Configuration of Visual Studio Resource Compilation -->
+    <ResourceCompile>
+      <PreprocessorDefinitions>
+        _DEBUG;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+    </ResourceCompile>
+
+    <!-- Configuration of Visual Studio IDL Compilation -->
+    <Midl>
+      <PreprocessorDefinitions>
+        _DEBUG;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+    </Midl>
+
+  </ItemDefinitionGroup>
+
+</Project>

@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  <Target Name="_PixlTargetAddLastCommitInfoToBuildOptions">
+    <PropertyGroup>
+      <PixlPropCommonBuildOptions Condition="'$(PixlPropSvnCurrentRevision)' != ''">$(PixlPropCommonBuildOptions) -p:PixlPropSvnCurrentRevision=$(PixlPropSvnCurrentRevision)</PixlPropCommonBuildOptions>
+      <PixlPropCommonBuildProperties Condition="'$(PixlPropSvnCurrentRevision)' != ''">$(PixlPropCommonBuildProperties);PixlPropSvnCurrentRevision=$(PixlPropSvnCurrentRevision)</PixlPropCommonBuildProperties>
+    </PropertyGroup>
+    <PropertyGroup>
+      <PixlPropCommonBuildOptions Condition="'$(PixlPropGitBranch)' != ''">$(PixlPropCommonBuildOptions) -p:PixlPropGitBranch=$(PixlPropGitBranch)</PixlPropCommonBuildOptions>
+      <PixlPropCommonBuildProperties Condition="'$(PixlPropGitBranch)' != ''">$(PixlPropCommonBuildProperties);PixlPropGitBranch=$(PixlPropGitBranch)</PixlPropCommonBuildProperties>
+    </PropertyGroup>
+    <PropertyGroup>
+      <PixlPropCommonBuildOptions Condition="'$(PixlPropGitCommit)' != ''">$(PixlPropCommonBuildOptions) -p:PixlPropGitCommit=$(PixlPropGitCommit)</PixlPropCommonBuildOptions>
+      <PixlPropCommonBuildProperties Condition="'$(PixlPropGitCommit)' != ''">$(PixlPropCommonBuildProperties);PixlPropGitCommit=$(PixlPropGitCommit)</PixlPropCommonBuildProperties>
+    </PropertyGroup>
+    <Message Text="PixlPropCommonBuildOptions=$(PixlPropCommonBuildOptions)" />
+    <Message Text="PixlPropCommonBuildProperties=$(PixlPropCommonBuildProperties)" />
+  </Target>
+
+
+  <Target Name="PixlTargetUpdateGitSubmodules">
+    <Exec Command="&quot;$(PixlPropToolsGitExePath)&quot; submodule init" />
+    <Exec Command="&quot;$(PixlPropToolsGitExePath)&quot; submodule update" />
+  </Target>
+
+
+  <Target Name="PixlTargetClean">
+    <MSBuild.ExtensionPack.FileSystem.Folder
+      TaskAction="RemoveContent"
+      Path="%(PixlItemPathsToClean.FullPath)"
+      Force="true"
+      RetryCount="1"
+      Condition="Exists('%(PixlItemPathsToClean.FullPath)')"
+      ContinueOnError="true"
+      />
+    <RemoveDir
+      Directories="@(PixlItemPathsToClean)"
+      ContinueOnError="true"
+      />
+    <Delete Files="@(PixlItemFilesToClean)" TreatErrorsAsWarnings="true" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetBuildCore"
+    DependsOnTargets="_PixlTargetAddLastCommitInfoToBuildOptions"
+    >
+    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(PixlPropSourcePath)\core.sln&quot; -p:Configuration=%(PixlItemConfigurations.Identity) $(PixlPropCommonBuildOptions)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetBuildJumbos"
+    DependsOnTargets="PixlTargetBuildCore"
+    >
+    <!-- For backward compatibility only -->
+  </Target>
+
+
+  <Target
+    Name="PixlTargetBuildUnitTests"
+    DependsOnTargets="_PixlTargetAddLastCommitInfoToBuildOptions"
+    >
+    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(PixlPropSourcePath)\unittests.sln&quot; -p:Configuration=%(PixlItemConfigurations.Identity) $(PixlPropCommonBuildOptions)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetBuildFuncTests"
+    DependsOnTargets="_PixlTargetAddLastCommitInfoToBuildOptions"
+    >
+    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(PixlPropSourcePath)\functests.sln&quot; -p:Configuration=%(PixlItemConfigurations.Identity) $(PixlPropCommonBuildOptions)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetBuildSamples"
+    DependsOnTargets="_PixlTargetAddLastCommitInfoToBuildOptions"
+    >
+    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(PixlPropSourcePath)\samples.sln&quot; -p:Configuration=%(PixlItemConfigurations.Identity) $(PixlPropCommonBuildOptions)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetBuildPerfs"
+    DependsOnTargets="_PixlTargetAddLastCommitInfoToBuildOptions"
+    >
+    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(PixlPropSourcePath)\perfs.sln&quot; -p:Configuration=%(PixlItemConfigurations.Identity) $(PixlPropCommonBuildOptions)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetExportNugetPackageFilesToRun_PerConfiguration"
+    >
+    <Copy
+      SourceFiles="%(NubuItemPackageFiles.FullPath)"
+      DestinationFolder="$(PixlPropOutputRunPath)\$(PixlPropConfiguration)%(NubuItemPackageFiles.Subdir)"
+      SkipUnchangedFiles="true"
+      />
+    <Copy
+      SourceFiles="%(Reference.FullPath)"
+      DestinationFolder="$(PixlPropOutputRunPath)\$(PixlPropConfiguration)"
+      SkipUnchangedFiles="true"
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetExportNugetPackageFilesToRun"
+    >
+    <MSBuild
+      Projects="$(PixlPropRootPath)\Pixl.Build.proj"
+      Targets="PixlTargetExportNugetPackageFilesToRun_PerConfiguration"
+      Properties="PixlPropPlatform=$(PixlPropPlatform);PixlPropToolset=$(PixlPropToolset);PixlPropConfiguration=%(PixlItemConfigurations.Identity)"
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetRunUnitTests"
+    DependsOnTargets="PixlTargetSetupEnv"
+    >
+    <PropertyGroup>
+      <PixlBuildRunUnitTestsCommand>
+        <![CDATA[
+        CD "$(PixlPropOutputRunPath)\Opt"
+        CALL "pixlunittests$(PixlPropApiVersion)_runner-ut$(PixlPropToolsetVersion).exe" $(PixlPropUnitTestsResultsOptions)
+        ]]>
+      </PixlBuildRunUnitTestsCommand>
+    </PropertyGroup>
+    <Exec Command="$(PixlBuildRunUnitTestsCommand)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetExportFuncTestsModifyScripts"
+    Outputs="%(PixlItemConfigurations.Identity)"
+    >
+    <PropertyGroup>
+      <_PixlPropModifyPIXLpyCommand>
+        <![CDATA[
+        echo from pixltests$(PixlPropApiVersion)_pypixl$(PixlPropToolsetVersion) import * > "$(PixlPropOutputRunPath)\%(PixlItemConfigurations.Identity)\pypixldll.py"
+        ]]>
+      </_PixlPropModifyPIXLpyCommand>
+    </PropertyGroup>
+    <Exec Command="$(_PixlPropModifyPIXLpyCommand)" />
+    <PropertyGroup>
+      <_PixlPropModifyRFApyCommand>
+        <![CDATA[
+        echo from pixltests$(PixlPropApiVersion)_pyrfa$(PixlPropToolsetVersion) import * > "$(PixlPropOutputRunPath)\%(PixlItemConfigurations.Identity)\pyrfadll.py"
+        ]]>
+      </_PixlPropModifyRFApyCommand>
+    </PropertyGroup>
+    <Exec Command="$(_PixlPropModifyRFApyCommand)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetRunFuncTests"
+    DependsOnTargets="PixlTargetSetupEnv"
+    >
+    <PropertyGroup>
+      <_PixlPropFuncTestsRunner>$(PixlPropSourceFuncTestsPath)\Framework\scripts\run-all.py</_PixlPropFuncTestsRunner>
+      <_PixlPropRunFuncTestsCommand>
+        <![CDATA[
+        cd "$(PixlPropOutputRunPath)\TestSuites"
+        "c:\python32\python.exe" "$(_PixlPropFuncTestsRunner)" $(PixlPropFuncTestsRunOptions) --root "$(PixlPropOutputRunPath)" --suites "$(PixlPropSourceFuncTestsPath)\TestSuites" --config "$(PixlPropEnvConfigPath)"
+        ]]>
+      </_PixlPropRunFuncTestsCommand>
+    </PropertyGroup>
+    <Exec Command="$(_PixlPropRunFuncTestsCommand)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetExportConfigToRun"
+    >
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="%(PixlItemExportSamplesPaths.Identity)"
+      Destination="%(PixlItemExportSamplesPaths.DestinationFolder)"
+      Files="*.*"
+      Options="/S /E /XD .svn"
+      />
+  </Target>
+
+
+  <Target
+     Name="PixlTargetExportRepalyDataToRunFileConfig"
+    >
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropSourcePerfsPath)\Replayer\Replayer\replaydata"
+      Destination="$(PixlPropOutputRunPath)\FileConfig\replaydata"
+      Files="*.*"
+      Options="/S /E"
+      />
+
+  </Target>
+
+
+  <Target Name="PixlTargetPublishSymbols">
+    <ItemGroup>
+      <_PixlPropPublishSymbolsFiles Include="$(PixlPropOutputPixlLibsPath)\Opt\*.dll">
+        <SymbolsStorePath>$(PixlPropPublishPublicSymbolsPath)</SymbolsStorePath>
+      </_PixlPropPublishSymbolsFiles>
+      <_PixlPropPublishSymbolsFiles Include="$(PixlPropOutputPixlLibsPath)\Opt\*.pdb">
+        <SymbolsStorePath>$(PixlPropPublishPrivateSymbolsPath)</SymbolsStorePath>
+      </_PixlPropPublishSymbolsFiles>
+      <_PixlPropPublishSymbolsFiles Include="$(PixlPropOutputPixlLibsPath)\Opt\symbols-stripped\*.pdb">
+        <SymbolsStorePath>$(PixlPropPublishPublicSymbolsPath)</SymbolsStorePath>
+      </_PixlPropPublishSymbolsFiles>
+    </ItemGroup>
+    <Exec Command="&quot;$(PixlPropToolsSymStorePath)\symstore.exe&quot; ADD /f &quot;%(_PixlPropPublishSymbolsFiles.Fullpath)&quot; /s &quot;%(_PixlPropPublishSymbolsFiles.SymbolsStorePath)&quot; /t &quot;PIXL&quot; /v &quot;$(PixlPropPackageIdentifier)&quot; /compress /o" />
+  </Target>
+
+
+  <Target Name="PixlTargetCheckoutWixPackage">
+    <Exec
+      Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; checkout &quot;$(PixlPropWixSvnUrl)&quot; &quot;$(PixlPropWixPath)&quot; $(PixlPropSvnCommonOptions) --depth=empty"
+      Condition="!Exists('$(PixlPropWixPath)')"
+      />
+    <Exec Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; update &quot;%(PixlItemWixSubDirs.Identity)&quot; $(PixlPropSvnCommonOptions) --depth=empty" />
+    <Exec Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; update &quot;$(PixlPropWixPixlFilesPath)&quot; $(PixlPropSvnCommonOptions)" />
+    <Exec Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; update &quot;$(PixlPropWixPixlSymbolsPath)&quot; $(PixlPropSvnCommonOptions)" />
+    <MakeDir
+      Directories="$(PixlPropWixPixlConfigPath)"
+      Condition="!Exists('$(PixlPropWixPixlConfigPath)')"
+      />
+    <MakeDir
+      Directories="$(PixlPropWixPixlProgramPath)"
+      Condition="!Exists('$(PixlPropWixPixlProgramPath)')"
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetCreateWixPackage"
+    DependsOnTargets="PixlTargetCheckoutWixPackage"
+    >
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputBinPath)\Opt\$(PixlPropPixlProtocolBinSubdir)"
+      Destination="$(PixlPropWixPixlProgramPath)\$(PixlPropPixlProtocolBinSubdir)"
+      Files="*.dll"
+      />
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputBinPath)\Opt\$(PixlPropPixlProtocolBinSubdir)"
+      Destination="$(PixlPropWixPixlProgramPath)\$(PixlPropPixlProtocolBinSubdir)"
+      Files="*.preload"
+      />
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputBinPath)\Opt\$(PixlPropPixlProtocolBinSubdir)"
+      Destination="$(PixlPropWixPixlProgramPath)\$(PixlPropPixlProtocolBinSubdir)"
+      Files="*.dll.manifest"
+      />
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputBinPath)\Opt\$(PixlPropPixlProtocolBinSubdir)"
+      Destination="$(PixlPropWixPixlProgramPath)\$(PixlPropPixlProtocolBinSubdir)"
+      Files="*.app-version"
+      />
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputBinPath)\Opt"
+      Destination="$(PixlPropWixPixlProgramPath)"
+      Files="*.dll"
+      />
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputBinPath)\Opt"
+      Destination="$(PixlPropWixPixlProgramPath)"
+      Files="*.xml"
+      />
+    <MakeDir
+      Directories="$(PixlPropWixPixlSymbolsPath)\dll"
+      Condition="!Exists('$(PixlPropWixPixlSymbolsPath)\dll')"
+      />
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputPixlLibsPath)\Opt"
+      Destination="$(PixlPropWixPixlSymbolsPath)\dll"
+      Files="*.pdb"
+      />
+    <Delete
+      Files="$(PixlPropWixPixlSymbolsPath)\PIXL_symbols.7z"
+      Condition="Exists('$(PixlPropWixPixlSymbolsPath)\PIXL_symbols.7z')" />
+    <PropertyGroup>
+      <_PixlProp7zCommand>
+        <![CDATA[
+        cd "$(PixlPropWixPixlSymbolsPath)"
+        "$(PixlPropTools7zPath)\7z.exe" a PIXL_symbols.7z dll\
+        ]]>
+      </_PixlProp7zCommand>
+    </PropertyGroup>
+    <Exec Command="$(_PixlProp7zCommand)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetCommitWixPackage"
+    DependsOnTargets="PixlTargetCreateWixPackage"
+    >
+    <Exec
+      Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; add &quot;$(PixlPropWixPixlConfigPath)&quot; $(PixlPropSvnCommonOptions)"
+      ContinueOnError="true"
+      />
+    <Exec
+      Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; add &quot;$(PixlPropWixPixlProgramPath)&quot; $(PixlPropSvnCommonOptions)"
+      ContinueOnError="true"
+      />
+    <Exec
+      Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; add &quot;$(PixlPropWixPixlSymbolsPath)\PIXL_symbols.7z&quot; $(PixlPropSvnCommonOptions)"
+      ContinueOnError="true"
+      />
+    <PropertyGroup>
+      <_PixlPropWixSvnMessageOption>--message="Automatic PIXL Package Delivery: Quality=$(PixlPropQualityLevel), Architecture=$(PixlPropPlatformToolsetLabel), Version=$(PixlPropPackageIdentifier)"</_PixlPropWixSvnMessageOption>
+    </PropertyGroup>
+    <Exec Command="&quot;$(PixlPropToolsSvnPath)\svn.exe&quot; commit &quot;$(PixlPropWixPath)&quot; $(PixlPropSvnCommonOptions) $(_PixlPropWixSvnMessageOption)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetCreateNugetPackage"
+    >
+
+    <ItemGroup>
+      <_PixlItemCreateNugetPackageProperties Remove="*" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropProfileName=pixl" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNativeVariantsList=[vs2010][vs2013]" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuProp_pixl_RootPath=$(PixlPropRootPath)" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNugetPackageVersion=$(PixlPropPackageIdentifier)" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNugetProfileOutputPath=$(PixlPropOutputPath)\nuget" />
+    </ItemGroup>
+
+    <MSBuild
+      Projects="$(PixlPropNugetInstallPath)\$(NubuProp_nubu_NugetPackageId).$(NubuProp_nubu_NugetPackageVersion)\build\native\msbuild\nubu.proj"
+      Targets="NubuTargetCreateNugetPackage"
+      Properties="@(_PixlItemCreateNugetPackageProperties)"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="PixlTargetPublishNugetPackage"
+    >
+    <MSBuild.ExtensionPack.FileSystem.RoboCopy
+      Source="$(PixlPropOutputPath)\nuget\pkg"
+      Destination="$(PixlPropPublishPackageLatestPath)\$(PixlPropPackageIdentifier)"
+      Files="*.nupkg"
+      Options=""
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetUploadNugetPackageToAzure"
+    >
+
+    <ItemGroup>
+      <_PixlItemCreateNugetPackageProperties Remove="*" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropProfileName=pixl" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuProp_pixl_RootPath=$(PixlPropRootPath)" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNugetPackageVersion=$(PixlPropPackageIdentifier)" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNugetProfileOutputPath=$(PixlPropOutputPath)\nuget" />
+    </ItemGroup>
+
+    <MSBuild
+      Projects="$(PixlPropNugetInstallPath)\$(NubuProp_nubu_NugetPackageId).$(NubuProp_nubu_NugetPackageVersion)\build\native\msbuild\nubu.proj"
+      Targets="NubuTargetUploadNugetPackageToAzure"
+      Properties="@(_PixlItemCreateNugetPackageProperties)"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="PixlTargetUploadNugetPackageToSami"
+    >
+
+    <ItemGroup>
+      <_PixlItemCreateNugetPackageProperties Remove="*" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropProfileName=pixl" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuProp_pixl_RootPath=$(PixlPropRootPath)" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNugetPackageVersion=$(PixlPropPackageIdentifier)" />
+      <_PixlItemCreateNugetPackageProperties Include="NubuPropNugetProfileOutputPath=$(PixlPropOutputPath)\nuget" />
+    </ItemGroup>
+
+    <MSBuild
+      Projects="$(PixlPropNugetInstallPath)\$(NubuProp_nubu_NugetPackageId).$(NubuProp_nubu_NugetPackageVersion)\build\native\msbuild\nubu.proj"
+      Targets="NubuTargetUploadNugetPackageToSami"
+      Properties="@(_PixlItemCreateNugetPackageProperties)"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="PixlTargetImportThirdParties"
+    DependsOnTargets="NubootTargetUnzipNuboot;NubootTargetDownloadInstallNubu;NubootTargetDownloadInstallNugetPackages"
+    >
+
+  </Target>
+
+
+  <Target
+    Name="PixlTargetSetupEnv"
+    >
+    <CallTarget Targets="PixlTargetGenerateAppLibFiles" />
+    <CallTarget Targets="PixlTargetGenerateAppLibAgentApplicationConfiguration" />
+    <CallTarget Targets="PixlTargetExportNugetPackageFilesToRun" />
+    <CallTarget Targets="PixlTargetExportConfigToRun" />
+    <CallTarget Targets="PixlTargetExportFuncTestsModifyScripts" />
+    <CallTarget Targets="PixlTargetExportRepalyDataToRunFileConfig" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetPublishReplayer"
+    >
+    <MSBuild
+      Projects="$(PixlPropSourcePerfsPath)\Replayer\Replayer\Replayer.csproj"
+      Targets="publish"
+      Properties="Configuration=Opt;Platform=$(PixlPropPlatform);ApplicationRevision=$(PixlPropSvnCurrentRevision);PublishDir=$(PixlPropOutputPubPath)\;ApplicationVersion=$(PixlPropMajorVersion).$(PixlPropMinorVersion).$(PixlPropLoadNumber).$(PixlPropSvnCurrentRevision)"
+      />
+
+    <Copy
+      SourceFiles="$(PixlPropSourcePerfsPath)\Replayer\Replayer\publish.htm"
+      DestinationFiles="$(PixlPropOutputPubPath)\publish.htm"
+      />
+
+    <MSBuild.Community.Tasks.FileUpdate
+      Files="$(PixlPropOutputPubPath)\publish.htm"
+      IgnoreCase="true"
+      Multiline="true"
+      Singleline="false"
+      Regex="(\d+)\.(\d+)\.(\d+)\.(\d+)"
+      ReplacementText="$(PixlPropMajorVersion).$(PixlPropMinorVersion).$(PixlPropLoadNumber).$(PixlPropSvnCurrentRevision)"
+      />
+
+    <MSBuild.Community.Tasks.FileUpdate
+      Files="$(PixlPropOutputPubPath)\publish.htm"
+      IgnoreCase="false"
+      Multiline="false"
+      Singleline="true"
+      Regex="Thomson Reuters Eikon Replayer\.application"
+      ReplacementText="ThomsonReuters.EikonReplayer.application"
+      />
+
+    <MSBuild.Community.Tasks.FileUpdate
+      Files="$(PixlPropOutputPubPath)\publish.htm"
+      IgnoreCase="false"
+      Multiline="false"
+      Singleline="true"
+      Regex="Thomson Reuters Eikon Replayer"
+      ReplacementText="Thomson Reuters Eikon Replayer ($(Platform))"
+      />
+
+    <MSBuild.Community.Tasks.FileUpdate
+      Files="$(PixlPropOutputPubPath)\publish.htm"
+      IgnoreCase="false"
+      Multiline="false"
+      Singleline="true"
+      Regex="setup.exe"
+      ReplacementText="ThomsonReuters.EikonReplayer.Setup.$(Platform).exe"
+      />
+
+    <Copy SourceFiles="$(PixlPropOutputPubPath)\setup.exe" DestinationFiles="$(PixlPropOutputPubPath)\ThomsonReuters.EikonReplayer.Setup.$(Platform).exe" />
+    <Delete Files="$(PixlPropOutputPubPath)\setup.exe" />
+
+    <Message Text="Publishing the Replayer from $(PixlPropOutputPubPath) to ftp://$(PixlPropEssFtpHost)$(PixlPropEssFtpRemoteDirectory)" />
+
+    <MSBuild.Community.Tasks.Ftp.FtpUploadDirectoryContent
+      ServerHost="$(PixlPropEssFtpHost)"
+      Port="$(PixlPropEssFtpPort)"
+      Username="$(PixlPropEssFtpUser)"
+      Password="$(PixlPropEssFtpPass)"
+      LocalDirectory="$(PixlPropOutputPubPath)\"
+      RemoteDirectory="$(PixlPropEssFtpRemoteDirectory)"
+      Recursive="true"
+      />
+
+    <Message Text="The Replayer package was uploaded successfully" />
+  </Target>
+
+
+  <Target Name="_PixlTargetGenerateAppLibFiles_PerConfiguration">
+    <MakeDir
+      Directories="$(PixlPropAppLibFilesOutputDir)\$(PixlPropConfiguration)\$(PixlPropPixlProtocolBinSubdir)"
+      ContinueOnError="true"
+      />
+    <WriteLinesToFile
+      File="$(PixlPropAppLibFilesOutputDir)\$(PixlPropConfiguration)\Apps\InstalledNativeAppList.xml"
+      Lines="&lt;NativeApps/&gt;"
+      Overwrite="true"
+      Encoding="UTF-8"
+      />
+    <MSBuild.ExtensionPack.Xml.XmlFile
+      TaskAction="%(PixlItemNativeAppAttributes.Action)"
+      File="$(PixlPropAppLibFilesOutputDir)\$(PixlPropConfiguration)\Apps\InstalledNativeAppList.xml"
+      Element="%(PixlItemNativeAppAttributes.Element)"
+      ParentElement="%(PixlItemNativeAppAttributes.ParentElement)"
+      Key="%(PixlItemNativeAppAttributes.Key)"
+      Value="%(PixlItemNativeAppAttributes.Value)"
+      />
+    <WriteLinesToFile
+      File="$(PixlPropAppLibFilesOutputDir)\$(PixlPropConfiguration)\$(PixlPropPixlProtocolBinSubdir)\$(PixlPropPixlProtocolName).app-version"
+      Lines="$(PixlPropMajorVersion).$(PixlPropMinorVersion).$(PixlPropLoadAndLevel).$(PixlPropSvnCurrentRevision)"
+      Overwrite="true"
+      Encoding="UTF-8"
+      />
+  </Target>
+
+
+  <Target Name="PixlTargetGenerateAppLibFiles">
+          
+    <ItemGroup>
+      <_PixlItemGeneratedAppLibFilesOutputDir Include="$(PixlPropOutputRunPath)" />
+      <_PixlItemGeneratedAppLibFilesOutputDir Include="$(PixlPropOutputBinPath)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_PixlItemGeneratedAppLibFilesInfo Include="@(_PixlItemGeneratedAppLibFilesOutputDir)">
+        <Configuration>%(PixlItemConfigurations.Identity)</Configuration>
+      </_PixlItemGeneratedAppLibFilesInfo>
+    </ItemGroup>    
+      
+    <MSBuild
+      Projects="$(PixlPropRootPath)\Pixl.Build.proj"
+      Targets="_PixlTargetGenerateAppLibFiles_PerConfiguration"
+      Properties="PixlPropAppLibFilesOutputDir=%(_PixlItemGeneratedAppLibFilesInfo.Identity);PixlPropPlatform=$(PixlPropPlatform);PixlPropToolset=$(PixlPropToolset);PixlPropConfiguration=%(_PixlItemGeneratedAppLibFilesInfo.Configuration);PixlPropSvnCurrentRevision=$(PixlPropSvnCurrentRevision)"
+      />
+  </Target>
+
+
+  <Target Name="_PixlTargetGenerateAppLibAgentApplicationConfiguration_PerConfiguration">
+    <MakeDir
+      Directories="$(PixlPropOutputRunPath)\$(PixlPropConfiguration)\$(PixlPropPixlProtocolBinSubdir)"
+      ContinueOnError="true"
+      />
+      <!-- Generate AppLibAgent.dll.config to redirect the version of Newtonsoft.Json -->
+    <WriteLinesToFile
+      File="$(PixlPropOutputRunPath)\$(PixlPropConfiguration)\AppLibAgent.dll.config"
+      Lines="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot;?&gt;&lt;configuration&gt;&lt;runtime&gt;&lt;assemblyBinding xmlns=&quot;urn:schemas-microsoft-com:asm.v1&quot;&gt;&lt;dependentAssembly&gt;&lt;assemblyIdentity name=&quot;Newtonsoft.Json&quot; culture=&quot;neutral&quot; publicKeyToken=&quot;30ad4fe6b2a6aeed&quot; /&gt;&lt;bindingRedirect oldVersion=&quot;4.5.0.0&quot; newVersion=&quot;6.0.0.0&quot; /&gt;&lt;/dependentAssembly&gt;&lt;/assemblyBinding&gt;&lt;/runtime&gt;&lt;/configuration&gt;"
+      Overwrite="true"
+      Encoding="UTF-8"
+      />
+  </Target>
+
+
+  <Target Name="PixlTargetGenerateAppLibAgentApplicationConfiguration">
+    <MSBuild
+      Projects="$(PixlPropRootPath)\Pixl.Build.proj"
+      Targets="_PixlTargetGenerateAppLibAgentApplicationConfiguration_PerConfiguration"
+      Properties="PixlPropPlatform=$(PixlPropPlatform);PixlPropToolset=$(PixlPropToolset);PixlPropConfiguration=%(PixlItemConfigurations.Identity);PixlPropSvnCurrentRevision=$(PixlPropSvnCurrentRevision)"
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetCMakeGenerate"
+    >
+
+    <ItemGroup>
+        <_PixlItemCoreProjects Include="$(PixlPropSourceCorePath)\jumbos\**\*.vcxproj" Exclude="$(PixlPropSourceCorePath)\jumbos\PermissionsUploader\ExcludeFromBuild\**\*.vcxproj;$(PixlPropSourceCorePath)\jumbos\PermissionsUploader\UnitTests\**\*.vcxproj" />
+    </ItemGroup>
+
+    <MSBuild
+      Projects="@(_PixlItemCoreProjects)"
+      Targets="PixlTargetCMakeGenerate"
+      />
+
+  </Target>
+
+
+</Project>

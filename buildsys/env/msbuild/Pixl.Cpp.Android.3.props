@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(PixlPropSourcePath);$(PixlPropSourceCorePath);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>
+        PIXL_CHAINMGR_AS_LIB_;
+        PIXL_INFRACPPTOOLS_AS_LIB_;
+        PIXL_INFRATOOLTEST_AS_LIB_;
+        PIXL_CONTEXT_AS_LIB_;
+        PIXL_UCONTRIBPUB_AS_LIB_;
+        PIXL_UDATAPUB_AS_LIB_;
+        PIXL_UDATASHARED_AS_LIB_;
+        PIXL_UDATASUB_AS_LIB_;
+        PIXL_USESSIONPUB_AS_LIB_;
+        PIXL_USESSIONSUB_AS_LIB_;
+        PIXL_RFASESSIONSHARED_AS_LIB_;
+        PIXL_RFASESSIONSUB_AS_LIB_;
+        PIXL_RFACONTRIBPUB_AS_LIB_;
+        _PIXL_CONFIG_AMD64_DIRTY_BUILD_;
+        Linux;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+</Project>

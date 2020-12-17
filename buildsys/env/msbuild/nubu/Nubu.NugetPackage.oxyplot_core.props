@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_oxyplot_core_NugetPackageId>OxyPlot.Core</NubuProp_oxyplot_core_NugetPackageId>
+    <NubuProp_oxyplot_core_NugetPackageVersion>2014.1.319.1</NubuProp_oxyplot_core_NugetPackageVersion>
+    <NubuProp_oxyplot_core_NugetPackageDllsPath>$(NubuPropNugetPackagesInstallPath)\$(NubuProp_oxyplot_core_NugetPackageId).$(NubuProp_oxyplot_core_NugetPackageVersion)\lib\portable-net4+sl4+wp71+win8</NubuProp_oxyplot_core_NugetPackageDllsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(NubuProp_oxyplot_core_NugetPackageDllsPath)\OxyPlot.dll" />
+  </ItemGroup>
+</Project>

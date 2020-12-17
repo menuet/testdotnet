@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Configuration of Pixl Build System -->
+  <PropertyGroup>
+
+    <PixlPropDebugSlowAssertionsLevel Condition="'$(PixlPropDebugSlowAssertionsLevel)' == ''">0</PixlPropDebugSlowAssertionsLevel>
+    <PixlPropDebugSecureSCL Condition="'$(PixlPropDebugSecureSCL)' == ''">0</PixlPropDebugSecureSCL>
+    <!--
+    <PixlPropDebugHasIteratorDebugging Condition="'$(PixlPropDebugHasIteratorDebugging)' == ''">0</PixlPropDebugHasIteratorDebugging>
+    <PixlPropDebugIteratorDebugLevel Condition="'$(PixlPropDebugIteratorDebugLevel)' == ''">0</PixlPropDebugIteratorDebugLevel>
+    -->
+
+    <PixlPropExportPixlBinaryPath>$(PixlPropOutputPixlLibsPath)</PixlPropExportPixlBinaryPath>
+    <PixlPropExportPixlBinaryPath Condition="'$(ConfigurationType)' == 'Application'">$(PixlPropOutputPixlPath)\program</PixlPropExportPixlBinaryPath>
+
+    <PixlPropUseCommonVersionResource Condition="$(PixlPropUseCommonVersionResource) == ''">true</PixlPropUseCommonVersionResource>
+
+    <PixlPropPixlLibs>
+      pixl$(PixlPropApiVersion)_chain$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_chainmgr$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_context$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_infracpptools$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_infrarttools$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_infratooltest$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_perfcounters$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_rfa$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_rfacontribpub$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_rfasessionshared$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_rfasessionsub$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_ucontribpub$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_udatapub$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_udatashared$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_udatasub$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_usessionpub$(PixlPropToolsetVersion).lib;
+      pixl$(PixlPropApiVersion)_usessionsub$(PixlPropToolsetVersion).lib;
+    </PixlPropPixlLibs>
+
+  </PropertyGroup>
+
+  <!-- Configuration of Visual Studio General Properties that must be set before importing Microsoft.Cpp.props -->
+  <PropertyGroup Label="Configuration">
+
+    <UseOfMfc Condition="'$(UseOfMfc)' == ''">false</UseOfMfc>
+
+    <UseOfAtl Condition="'$(UseOfAtl)' == ''">false</UseOfAtl>
+
+    <CharacterSet Condition="'$(CharacterSet)' == ''">MultiByte</CharacterSet>
+
+    <CLRSupport Condition="'$(CLRSupport)' == ''">false</CLRSupport>
+
+    <WholeProgramOptimization Condition="'$(WholeProgramOptimization)' == '' and '$(Configuration)' == 'Debug'">false</WholeProgramOptimization>
+    <WholeProgramOptimization Condition="'$(WholeProgramOptimization)' == '' and '$(Configuration)' == 'Opt'">true</WholeProgramOptimization>
+
+    <UseDebugLibraries Condition="'$(UseDebugLibraries)' == '' and '$(Configuration)' == 'Debug'">true</UseDebugLibraries>
+    <UseDebugLibraries Condition="'$(UseDebugLibraries)' == '' and '$(Configuration)' == 'Opt'">false</UseDebugLibraries>
+
+  </PropertyGroup>
+
+</Project>

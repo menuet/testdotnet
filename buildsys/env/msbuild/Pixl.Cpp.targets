@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  <Target
+    Name="PixlTargetPostBuildModifyPreloadFile"
+    AfterTargets="PostBuildEvent"
+    Inputs="$(ProjectDir)\$(ProjectName).preload"
+    Outputs="$(TargetDir)$(TargetName).preload"
+    Condition="Exists('$(ProjectDir)\$(ProjectName).preload')"
+    >
+    <ReadLinesFromFile File="$(ProjectDir)\$(ProjectName).preload">
+      <Output TaskParameter="Lines" ItemName="_PixlItemPreloadFileLines" />
+    </ReadLinesFromFile>
+    <ItemGroup>
+      <_PixlItemPreloadFileLines>
+        <Decorated>pixl$(PixlPropApiVersion)_%(Identity)$(PixlPropToolsetVersion)</Decorated>
+      </_PixlItemPreloadFileLines>
+    </ItemGroup>
+    <WriteLinesToFile File="$(TargetDir)$(TargetName).preload" Lines="@(_PixlItemPreloadFileLines->'%(Decorated)')" Overwrite="true" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetPostBuildGenerateLibForUnitTests"
+    AfterTargets="PostBuildEvent"
+    Condition="'$(PixlPropGenerateLibForUnitTests)' == 'true'"
+    >
+    <PropertyGroup>
+      <_PixlPropLibCommand>"$(PixlPropToolsVcBinPath)\Lib.exe" "/OUT:$(TargetPath).lib-for-ut" /NOLOGO</_PixlPropLibCommand>
+      <_PixlPropLibCommand Condition="'$(Platform)' == 'Win32'">$(_PixlPropLibCommand) /MACHINE:X86</_PixlPropLibCommand>
+      <_PixlPropLibCommand Condition="'$(Platform)' == 'x64'">$(_PixlPropLibCommand) /MACHINE:X64</_PixlPropLibCommand>
+      <_PixlPropLibCommand>$(_PixlPropLibCommand) %22$(IntDir)*.obj%22</_PixlPropLibCommand>
+    </PropertyGroup>
+    <Message Text="Creating Static Lib for Unit Tests: $(_PixlPropLibCommand)" />
+    <Exec Command="$(_PixlPropLibCommand)" />
+  </Target>
+
+  <Target
+    Name="PixlTargetPostBuildExportExternalManifestFiles"
+    AfterTargets="PixlTargetPostBuildGenerateLibForUnitTests"
+    Inputs="$(ProjectDir)\$(ProjectName).external.manifest"
+    Outputs="$(TargetDir)$(TargetName)$(TargetExt).manifest"
+    Condition="Exists('$(ProjectDir)\$(ProjectName).external.manifest')"
+    >
+    <Message Text="Copying external manifest file" />
+    <Copy
+      SourceFiles="$(ProjectDir)\$(ProjectName).external.manifest"
+      DestinationFiles="$(TargetDir)$(TargetName)$(TargetExt).manifest"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      />
+  </Target>
+
+  <!-- condition = depends on RFA, is a dynamic library or an application, and is not 'Core'-->
+  <Target
+    Name="PixlTargetPostBuildGenerateBindingRedirectToProtocolBinSubDir"
+    AfterTargets="PixlTargetPostBuildExportExternalManifestFiles"
+    Inputs=""
+    Outputs=""
+    Condition="('$(NubuProp_rfa_MajorVersion)' != '') and (('$(ConfigurationType)' == 'DynamicLibrary') or ('$(ConfigurationType)' == 'Application')) and ('$(PixlPropProjectCategory)' != 'Core')"
+    >
+    <PropertyGroup>
+      <_PixlPropBindingRedirectPath Condition="'$(ConfigurationType)' == 'DynamicLibrary'">$(TargetPath).2.config</_PixlPropBindingRedirectPath>
+      <_PixlPropBindingRedirectPath Condition="'$(ConfigurationType)' == 'Application'">$(TargetPath).config</_PixlPropBindingRedirectPath>
+
+      <_PixlPropBindingRedirectContent>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot;?&gt;&lt;configuration&gt;&lt;windows&gt;&lt;assemblyBinding xmlns=&quot;urn:schemas-microsoft-com:asm.v1&quot;&gt;&lt;probing privatePath=&quot;$(PixlPropPixlProtocolBinSubdir)&quot; /&gt;&lt;/assemblyBinding&gt;&lt;/windows&gt;&lt;/configuration&gt;</_PixlPropBindingRedirectContent>
+    </PropertyGroup>
+
+    <Message Text="Generating application configuration file" />
+    <Message Text="  Path = $(_PixlPropBindingRedirectPath)" Importance="low" />
+    <Message Text="  Content = $(_PixlPropBindingRedirectContent)" Importance="low" />
+
+    <WriteLinesToFile
+      File="$(_PixlPropBindingRedirectPath)"
+      Lines="$(_PixlPropBindingRedirectContent)"
+      Overwrite="true"
+      Encoding="UTF-8"
+      />
+  </Target>
+
+  <Target
+    Name="PixlTargetPostBuildExportGeneratedFiles"
+    AfterTargets="PixlTargetPostBuildGenerateBindingRedirectToProtocolBinSubDir"
+    Inputs=""
+    Outputs=""
+    Condition="'$(ConfigurationType)' == 'DynamicLibrary' or '$(ConfigurationType)' == 'Application'"
+    >
+
+    <ItemGroup>
+      <_PixlItemProtocolProjects Include="$(PixlPropPixlProtocolProjects)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_PixlPropIsProtocolProject>@(_PixlItemProtocolProjects->WithMetadataValue("Identity", "$(ProjectName)")->Count())</_PixlPropIsProtocolProject>
+      <_PixlPropProtocolSubdirAndSlash Condition="$(_PixlPropIsProtocolProject) > 0">$(PixlPropPixlProtocolBinSubdir)\</_PixlPropProtocolSubdirAndSlash>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_PixlItemGeneratedFiles Include="$(TargetPath)">
+        <NewName>$(TargetName)$(TargetExt)</NewName>
+        <ExportGroup>Bin</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName).preload" Condition="Exists('$(TargetDir)$(TargetName).preload')">
+        <NewName>$(TargetName).preload</NewName>
+        <ExportGroup>Bin</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName).xml" Condition="Exists('$(TargetDir)$(TargetName).xml')">
+        <NewName>$(TargetName).xml</NewName>
+        <ExportGroup>Bin</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName).dll.manifest" Condition="Exists('$(TargetDir)$(TargetName).dll.manifest')">
+        <NewName>$(TargetName).dll.manifest</NewName>
+        <ExportGroup>Bin</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName)$(TargetExt).config" Condition="Exists('$(TargetDir)$(TargetName)$(TargetExt).config')">
+        <NewName>$(TargetName)$(TargetExt).config</NewName>
+        <ExportGroup>Bin</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName)$(TargetExt).2.config" Condition="Exists('$(TargetDir)$(TargetName)$(TargetExt).2.config')">
+        <NewName>$(TargetName)$(TargetExt).2.config</NewName>
+        <ExportGroup>Bin</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName).pdb" Condition="Exists('$(TargetDir)$(TargetName).pdb')">
+        <NewName>$(TargetName).pdb</NewName>
+        <ExportGroup>Pdb</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName).stripped.pdb" Condition="Exists('$(TargetDir)$(TargetName).stripped.pdb')">
+        <NewName>symbols-stripped\$(TargetName).pdb</NewName>
+        <ExportGroup>Pdb</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(TargetDir)$(TargetName).lib" Condition="Exists('$(TargetDir)$(TargetName).lib')">
+        <NewName>$(TargetName).lib</NewName>
+        <ExportGroup>Lib</ExportGroup>
+      </_PixlItemGeneratedFiles>
+      <_PixlItemGeneratedFiles Include="$(IntDir)$(ProjectName).tlb" Condition="Exists('$(IntDir)$(ProjectName).tlb')">
+        <NewName>$(ProjectName).tlb</NewName>
+        <ExportGroup>Tlb</ExportGroup>
+      </_PixlItemGeneratedFiles>
+    </ItemGroup>
+
+    <!-- Export lib file to $(PixlPropOutputVariantPath)\lib -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropOutputLibPath)\$(Configuration)\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'%(_PixlItemGeneratedFiles.ExportGroup)' == 'Lib'"
+      />
+
+    <!-- Export tlb file to $(PixlPropOutputVariantPath)\tlb -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropOutputTlbPath)\$(Configuration)\pixl\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'%(_PixlItemGeneratedFiles.ExportGroup)' == 'Tlb'"
+      />
+
+    <!-- Export dll, exe, preload, pdb files to $(PixlPropOutputVariantPath)\bin -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropOutputBinPath)\$(Configuration)\$(_PixlPropProtocolSubdirAndSlash)%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'%(_PixlItemGeneratedFiles.ExportGroup)' == 'Bin' or '%(_PixlItemGeneratedFiles.ExportGroup)' == 'Pdb'"
+      />
+
+    <!-- Export Core lib, dll, exe, preload, pdb files to $(PixlPropOutputPixlPath)\libs or program -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropExportPixlBinaryPath)\$(Configuration)\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'$(PixlPropDoExportToPIXL)' == 'true' and '%(_PixlItemGeneratedFiles.ExportGroup)' != 'Tlb'"
+      />
+
+    <!-- Export Core tlb files to $(PixlPropOutputPixlPath)\tlbs -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropOutputPixlPath)\tlbs\$(Configuration)\pixl\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'$(PixlPropDoExportToPIXL)' == 'true' and '%(_PixlItemGeneratedFiles.ExportGroup)' == 'Tlb'"
+      />
+
+    <!-- Export dll, exe, preload files to $(PixlPropOutputVariantPath)\run -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropOutputRunPath)\$(Configuration)\$(_PixlPropProtocolSubdirAndSlash)%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'%(_PixlItemGeneratedFiles.ExportGroup)' == 'Bin'"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="PixlTargetPostBuildExportGeneratedFilesToEikonOffice"
+    AfterTargets="PixlTargetPostBuildExportGeneratedFiles"
+    Inputs=""
+    Outputs=""
+    Condition="'$(PixlPropExportToEikonOffice)' == 'true'"
+    >
+
+    <PropertyGroup>
+      <_Configuration Condition="$(Configuration) != 'Opt'">$(Configuration)</_Configuration>
+      <_Configuration Condition="$(Configuration) == 'Opt'">Release</_Configuration>
+    </PropertyGroup>
+
+    <!-- Export generated files to EikonOffice -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropEikonOfficePath)\bin\$(PixlPropPlatform)\$(_Configuration)\bin\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="('%(_PixlItemGeneratedFiles.ExportGroup)' == 'Bin' or '%(_PixlItemGeneratedFiles.ExportGroup)' == 'Pdb')"
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetRetrieveEikonDesktopBinPath"
+    Inputs=""
+    Outputs=""
+    Condition=""
+    >
+    <PropertyGroup>
+      <_PixlPropEikonExeXml>$(PixlPropEikonDesktopPath)\Eikon.exe.xml</_PixlPropEikonExeXml>
+    </PropertyGroup>
+
+    <!-- Retrieve Eikon Bin\ path from Eikon.exe.xml if necessary -->
+    <XmlFile TaskAction="ReadElementText" File="$(_PixlPropEikonExeXml)" XPath="/Eikon/BinFolder" Condition="'$(PixlPropExportToEikonDesktop)' == 'true' and '$(PixlPropEikonDesktopBinPath)' == '' and Exists('$(_PixlPropEikonExeXml)')">
+      <Output PropertyName="PixlPropEikonDesktopBinPath" TaskParameter="Value"/>
+    </XmlFile>
+
+    <Message Text="$(PixlPropEikonDesktopBinPath)" />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetPostBuildExportGeneratedFilesToEikonDesktop"
+    AfterTargets="PixlTargetPostBuildExportGeneratedFiles"
+    Inputs=""
+    Outputs=""
+    Condition="'$(PixlPropExportToEikonDesktop)' == 'true'"
+    DependsOnTargets="PixlTargetRetrieveEikonDesktopBinPath"
+    >
+
+    <!-- Export generated files to Eikon -->
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(PixlPropEikonDesktopBinPath)\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="'$(Configuration)' == 'Opt' and ('%(_PixlItemGeneratedFiles.ExportGroup)' == 'Bin' or '%(_PixlItemGeneratedFiles.ExportGroup)' == 'Pdb')"
+      />
+  </Target>
+
+
+  <Target
+    Name="PixlTargetPostBuildExportGeneratedFilesToRTX"
+    AfterTargets="PixlTargetPostBuildExportGeneratedFiles"
+    Inputs=""
+    Outputs=""
+    Condition="'$(PixlPropExportToRTX)' == 'true'"
+    >
+
+    <!-- Export generated files to RTX -->
+    <PropertyGroup>
+      <_PixlPropRTXBinPath>$(PixlPropRTXPath)\AdfinXRT\output\$(PixlPropPlatformToolsetLabel)\run\$(_Configuration)\Program</_PixlPropRTXBinPath>
+    </PropertyGroup>
+
+    <Copy
+      SourceFiles="%(_PixlItemGeneratedFiles.Identity)"
+      DestinationFiles="$(_PixlPropRTXBinPath)\%(_PixlItemGeneratedFiles.NewName)"
+      Retries="2"
+      RetryDelayMilliseconds="500"
+      SkipUnchangedFiles="true"
+      Condition="('%(_PixlItemGeneratedFiles.ExportGroup)' == 'Bin' or '%(_PixlItemGeneratedFiles.ExportGroup)' == 'Pdb')"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="_PixlTargetCMakeCreateFilesFile"
+    >
+
+    <PropertyGroup>
+      <_PixlPropCMakeFilesFileName>$(ProjectName)-files.cmake</_PixlPropCMakeFilesFileName>
+      <_PixlPropCMakeFilesFilePath>$(ProjectDir)$(_PixlPropCMakeFilesFileName)</_PixlPropCMakeFilesFilePath>
+      <_PixlPropCMakeTweaksFileName>$(ProjectName)-tweaks.cmake</_PixlPropCMakeTweaksFileName>
+      <_PixlPropCMakeTweaksFilePath>$(ProjectDir)$(_PixlPropCMakeTweaksFileName)</_PixlPropCMakeTweaksFilePath>
+      <_PixlPropProjectUpperName>$(ProjectName.ToUpper())</_PixlPropProjectUpperName>
+    </PropertyGroup>
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="# This file was generated by the target PixlTargetGenerateCMakeFile in the project $(ProjectName)"
+      Overwrite="true"
+      Encoding="UTF-8"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="_PixlTargetCMakeWriteSourcesList"
+    >
+
+    <ItemGroup>
+        <_PixlItemCmakeSourceFiles Include="@(ClCompile)">
+            <CMakeLine>&#032;&#032;&#032;&#032;&quot;%24{CMAKE_CURRENT_SOURCE_DIR}/$([System.String]::Copy('%(Identity)').Replace('\','/'))&quot;</CMakeLine>
+        </_PixlItemCmakeSourceFiles>
+        <_PixlItemCmakeCAsCppFiles Include="@(ClCompile)" Condition="'%(ClCompile.Extension)' == '.c' and '%(ClCompile.CompileAs)' == 'CompileAsCpp'">
+            <CMakeLine>&#032;&#032;&#032;&#032;&quot;%24{CMAKE_CURRENT_SOURCE_DIR}/$([System.String]::Copy('%(Identity)').Replace('\','/'))&quot;</CMakeLine>
+        </_PixlItemCmakeCAsCppFiles>
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="set($(_PixlPropProjectUpperName)_SOURCE_FILES"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="@(_PixlItemCmakeSourceFiles->'%(CMakeLine)')"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines=")"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="set($(_PixlPropProjectUpperName)_RESOURCE_FILES"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="&#032;&#032;&#032;&#032;&quot;%24{CMAKE_CURRENT_SOURCE_DIR}/$(ProjectName).rc&quot;"
+      Overwrite="false"
+      Encoding="UTF-8"
+      Condition="Exists('$(ProjectDir)$(ProjectName)')"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="&#032;&#032;&#032;&#032;&quot;%24{PIXL_SRC_SHARED_RESOURCE_DIR}/pixl_version.rc&quot;"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines=")"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="set($(_PixlPropProjectUpperName)_C_AS_CPP_FILES"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="@(_PixlItemCmakeCAsCppFiles->'%(CMakeLine)')"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines=")"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="_PixlTargetCMakeWriteHeadersList"
+    >
+
+    <ItemGroup>
+        <_PixlItemCmakePrivateHeaderFiles Include="$(ProjectDir)**\*.h" />
+        <_PixlItemCmakePublicHeaderFiles Include="$(ProjectDir)..\..\pixl\$(ProjectName)\**\*.h" Condition="Exists('..\..\pixl\$(ProjectName)')" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <_PixlItemCmakePrivateHeaderFiles>
+            <CMakeLine>&#032;&#032;&#032;&#032;&quot;%24{CMAKE_CURRENT_SOURCE_DIR}/$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\','/'))&quot;</CMakeLine>
+        </_PixlItemCmakePrivateHeaderFiles>
+        <_PixlItemCmakePublicHeaderFiles>
+            <CMakeLine>&#032;&#032;&#032;&#032;&quot;%24{PIXL_SRC_CORE_PIXL_DIR}/$(ProjectName)/$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\','/'))&quot;</CMakeLine>
+        </_PixlItemCmakePublicHeaderFiles>
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="set($(_PixlPropProjectUpperName)_HEADER_FILES"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="@(_PixlItemCmakePrivateHeaderFiles->'%(CMakeLine)')"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines="@(_PixlItemCmakePublicHeaderFiles->'%(CMakeLine)')"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeFilesFilePath)"
+      Lines=")"
+      Overwrite="false"
+      Encoding="UTF-8"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="_PixlTargetCMakeCreateCMakeListsTxt"
+    >
+
+    <ItemGroup>
+        <_PixlItemCmakeListsLines Include="project($(ProjectName))" />
+        <_PixlItemCmakeListsLines Include="include(&quot;%24{CMAKE_CURRENT_SOURCE_DIR}/$(_PixlPropCMakeFilesFileName)&quot;)" />
+        <_PixlItemCmakeListsLines Include="add_library($(ProjectName) ${PIXL_DEFAULT_LIBRARY_TYPE} %24{$(_PixlPropProjectUpperName)_SOURCE_FILES} %24{$(_PixlPropProjectUpperName)_RESOURCE_FILES} %24{$(_PixlPropProjectUpperName)_HEADER_FILES})" />
+        <_PixlItemCmakeListsLines Include="if(NOT &quot;${$(_PixlPropProjectUpperName)_C_AS_CPP_FILES}&quot; STREQUAL &quot;&quot;)" />
+        <_PixlItemCmakeListsLines Include="set_source_files_properties(${$(_PixlPropProjectUpperName)_C_AS_CPP_FILES} PROPERTIES LANGUAGE CXX)" />
+        <_PixlItemCmakeListsLines Include="endif()" />
+        <_PixlItemCmakeListsLines Include="target_include_directories($(ProjectName) PRIVATE &quot;${CMAKE_CURRENT_SOURCE_DIR}&quot; &quot;${PIXL_SRC_CORE_DIR}&quot;)" />
+        <_PixlItemCmakeListsLines Include="target_compile_definitions($(ProjectName) PRIVATE ${PIXL_DEFINITIONS})" />
+        <_PixlItemCmakeListsLines Include="if(MSVC)" />
+        <_PixlItemCmakeListsLines Include="&#032;&#032;&#032;&#032;target_compile_definitions($(ProjectName) PRIVATE PIXL_$(_PixlPropProjectUpperName)_BUILD_)" />
+        <_PixlItemCmakeListsLines Include="endif()" />
+        <_PixlItemCmakeListsLines Include="target_compile_options($(ProjectName) PRIVATE ${PIXL_CPP_FLAGS})" />
+        <_PixlItemCmakeListsLines Include="include(&quot;%24{CMAKE_CURRENT_SOURCE_DIR}/$(_PixlPropCMakeTweaksFileName)&quot;)" />
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(ProjectDir)CMakeLists.txt"
+      Lines="@(_PixlItemCmakeListsLines)"
+      Overwrite="true"
+      Encoding="UTF-8"
+      />
+
+    <WriteLinesToFile
+      File="$(_PixlPropCMakeTweaksFilePath)"
+      Lines="#Non-generated tweaks here:"
+      Overwrite="true"
+      Encoding="UTF-8"
+      Condition="!Exists('$(_PixlPropCMakeTweaksFilePath)')"
+      />
+
+  </Target>
+
+
+  <Target
+    Name="PixlTargetCMakeGenerate"
+    DependsOnTargets="_PixlTargetCMakeCreateFilesFile;_PixlTargetCMakeWriteSourcesList;_PixlTargetCMakeWriteHeadersList;_PixlTargetCMakeCreateCMakeListsTxt"
+    >
+
+  </Target>
+
+
+</Project>

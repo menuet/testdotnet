@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Env.props" />
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Env.Python.FuncTest.props" />
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.$(PixlPropTargetOS).1.props" />
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.$(PixlPropTargetOS).2.props" />
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.$(PixlPropTargetOS).3.props" />
+    <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.$(PixlPropTargetOS).3.$(Configuration).props" />
+    <Import
+      Project="$(MSBuildThisFileDirectory)nubu\Nubu.NugetPackages.props"
+      Condition="Exists('$(MSBuildThisFileDirectory)nubu\Nubu.NugetPackages.props')"
+      />
+  </ImportGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>
+        PIXL_PROP_RFA_VERSION=$(NubuProp_rfa_NugetPackageVersion);
+        PIXL_PROP_RFA_MAJOR_VERSION=$(NubuProp_rfa_MajorVersion);
+        PIXL_PROP_RFA_VS_VERSION=$(NubuProp_rfa_ToolsetVersion);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions Condition="'$(NubuProp_rfa_NugetPackageVersion)' != ''">
+        PIXL_PROP_RFA_VERSION=$(NubuProp_rfa_NugetPackageVersion);
+        PIXL_PROP_RFA_MAJOR_VERSION=$(NubuProp_rfa_MajorVersion);
+        PIXL_PROP_RFA_VS_VERSION=$(NubuProp_rfa_ToolsetVersion);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.items" />
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.tasks" />
+
+  <Import Project="$(MSBuildThisFileDirectory)Pixl.Cpp.targets" />
+
+</Project>

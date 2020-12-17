@@ -1,0 +1,307 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Configuration of Pixl General Properties -->
+  <PropertyGroup>
+    <PixlPropGenerateLibForUnitTests Condition="'$(PixlPropGenerateLibForUnitTests)' == ''">false</PixlPropGenerateLibForUnitTests>
+
+    <PixlPropUseLibForUnitTests Condition="'$(PixlPropUseLibForUnitTests)' == ''">false</PixlPropUseLibForUnitTests>
+
+    <PixlPropDoExportToPIXL Condition="'$(PixlPropDoExportToPIXL)' == ''">false</PixlPropDoExportToPIXL>
+
+    <PixlPropTransformTargetName Condition="'$(PixlPropTransformTargetName)' == '' and '$(PixlPropProjectCategory)' == 'Core'">true</PixlPropTransformTargetName>
+    <PixlPropTransformTargetName Condition="'$(PixlPropTransformTargetName)' == '' and '$(PixlPropProjectCategory)' == 'UnitTest'">true</PixlPropTransformTargetName>
+    <PixlPropTransformTargetName Condition="'$(PixlPropTransformTargetName)' == '' and '$(PixlPropProjectCategory)' == 'FuncTest'">true</PixlPropTransformTargetName>
+    <PixlPropTransformTargetName Condition="'$(PixlPropTransformTargetName)' == '' and '$(PixlPropProjectCategory)' == 'Shared'">true</PixlPropTransformTargetName>
+    <PixlPropTransformTargetName Condition="'$(PixlPropTransformTargetName)' == ''">false</PixlPropTransformTargetName>
+
+    <PixlPropTargetNamePrefix Condition="'$(PixlPropTargetNamePrefix)' == '' and '$(PixlPropProjectCategory)' == 'Core'">pixl</PixlPropTargetNamePrefix>
+    <PixlPropTargetNamePrefix Condition="'$(PixlPropTargetNamePrefix)' == '' and '$(PixlPropProjectCategory)' == 'UnitTest'">pixlunittests</PixlPropTargetNamePrefix>
+    <PixlPropTargetNamePrefix Condition="'$(PixlPropTargetNamePrefix)' == '' and '$(PixlPropProjectCategory)' == 'FuncTest'">pixltests</PixlPropTargetNamePrefix>
+    <PixlPropTargetNamePrefix Condition="'$(PixlPropTargetNamePrefix)' == '' and '$(PixlPropProjectCategory)' == 'Shared'">pixlshared</PixlPropTargetNamePrefix>
+    <PixlPropTargetNamePrefix Condition="'$(PixlPropTargetNamePrefix)' == ''"></PixlPropTargetNamePrefix>
+
+    <PixlPropProjectRelativePath Condition="'$(PixlPropProjectRelativePath)' == ''">$([MSBuild]::MakeRelative($(PixlPropSourcePath), $([System.IO.Path]::Combine($(ProjectDir), '..'))))</PixlPropProjectRelativePath>
+
+  </PropertyGroup>
+
+  <!-- Configuration of Visual Studio General Properties -->
+  <PropertyGroup>
+    <TargetName>$(ProjectName)</TargetName>
+    <TargetName Condition="$(PixlPropTransformTargetName)">$(PixlPropTargetNamePrefix)$(PixlPropApiVersion)_$(ProjectName)$(PixlPropToolsetVersion)</TargetName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+
+    <OutDir>$(PixlPropOutputObjPath)\$(PixlPropProjectRelativePath)\$(ProjectName)\$(Configuration)\out\</OutDir>
+    <IntDir>$(PixlPropOutputObjPath)\$(PixlPropProjectRelativePath)\$(ProjectName)\$(Configuration)\int\</IntDir>
+
+    <LocalDebuggerCommand>$(PixlPropOutputRunPath)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(PixlPropOutputRunPath)\$(Configuration)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments></LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PixlPropProjectCategory)' == 'Core'">
+    <LocalDebuggerCommand>c:\python32\python.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>$(PixlPropSourceFuncTestsPath)\Framework\scripts\worker\feature.py --pyfeaturedesc "$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)\$(PixlPropSelectedFuncTestFeature)" --pyfeatureimpl "$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)\$(PixlPropSelectedFuncTestPython)" --pylog "$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)\$(PixlPropSelectedFuncTestLog)" --pump 50000</LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>
+      PYTHONPATH=$(PixlPropOutputRunPath)\$(Configuration);$(PixlPropSourceFuncTestsPath)\Framework\scripts\worker
+      PATH=$(Path);$(PixlPropOutputRunPath)\$(Configuration)
+    </LocalDebuggerEnvironment>
+    <PixlPropGenerateLibForUnitTests Condition="'$(ConfigurationType)' == 'DynamicLibrary'">true</PixlPropGenerateLibForUnitTests>
+    <PixlPropDoExportToPIXL>true</PixlPropDoExportToPIXL>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PixlPropProjectCategory)' == 'UnitTest'">
+    <LocalDebuggerCommand>$(PixlPropOutputRunPath)\$(Configuration)\pixlunittests$(PixlPropApiVersion)_runner-ut$(PixlPropToolsetVersion).exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(PixlPropOutputRunPath)\$(Configuration)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments Condition="'$(ConfigurationType)' != 'Application'">--files_mask="$(TargetName)$(TargetExt)" --gtest_break_on_failure --gtest_catch_exceptions=0 --gtest_filter=*</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments Condition="'$(ConfigurationType)' == 'Application'">--files_mask="pixlunittests*.dll" --gtest_shuffle --gtest_break_on_failure --gtest_catch_exceptions=0</LocalDebuggerCommandArguments>
+    <PixlPropUnitTestedProject>$(ProjectName.Substring(0, $([MSBuild]::Subtract($(ProjectName.Length), 3))))</PixlPropUnitTestedProject>
+
+    <PixlPropUnitTestedProjectSrcDir>$(ProjectDir)</PixlPropUnitTestedProjectSrcDir> <!-- temporarily set it to $(ProjectDir) before updating it -->    
+    <PixlPropUnitTestedProjectSrcDir>$([System.IO.Path]::Combine($(PixlPropUnitTestedProjectSrcDir), '..\..'))</PixlPropUnitTestedProjectSrcDir>
+    <PixlPropUnitTestedProjectRelativePath>$([MSBuild]::MakeRelative($(PixlPropSourcePath), $(PixlPropUnitTestedProjectSrcDir)))</PixlPropUnitTestedProjectRelativePath>
+    <PixlPropUseLibForUnitTests Condition="'$(ConfigurationType)' == 'DynamicLibrary'">true</PixlPropUseLibForUnitTests>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PixlPropProjectCategory)' == 'FuncTest'">
+    <LocalDebuggerCommand Condition="'$(ConfigurationType)' == 'DynamicLibrary'">c:\python32\python.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand Condition="'$(ConfigurationType)' == 'Application'">$(PixlPropOutputRunPath)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments Condition="'$(ConfigurationType)' == 'DynamicLibrary'">$(PixlPropSourceFuncTestsPath)\Framework\scripts\worker\feature.py --pyfeaturedesc "$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)\$(PixlPropSelectedFuncTestFeature)" --pyfeatureimpl "$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)\$(PixlPropSelectedFuncTestPython)" --pylog "$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)\$(PixlPropSelectedFuncTestLog)" --pump 50000</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments Condition="'$(ConfigurationType)' == 'Application'">--xml=MyXmlDataFile.xml --rfa=MyRfa.cfg --app=MyApp.cfg</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory Condition="'$(ConfigurationType)' == 'DynamicLibrary'">$(PixlPropSourceFuncTestsPath)\$(PixlPropSelectedFuncTestDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory Condition="'$(ConfigurationType)' == 'Application'">$(PixlPropOutputRunPath)\$(Configuration)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment Condition="'$(ConfigurationType)' == 'DynamicLibrary'">
+      PYTHONPATH=$(PixlPropOutputRunPath)\$(Configuration);$(PixlPropSourceFuncTestsPath)\Framework\scripts\worker
+      PATH=$(Path);$(PixlPropOutputRunPath)\$(Configuration)
+    </LocalDebuggerEnvironment>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PixlPropVersionsMacros>
+      PIXL_PROP_API_VERSION=$(PixlPropApiVersion);
+      PIXL_PROP_VS_VERSION=$(PixlPropToolsetVersion);
+      PIXL_PROP_MAJOR_VERSION=$(PixlPropMajorVersion);
+      PIXL_PROP_MINOR_VERSION=$(PixlPropMinorVersion);
+      PIXL_PROP_LOAD_NUMBER=$(PixlPropLoadNumber);
+      PIXL_PROP_LOAD_AND_LEVEL=$(PixlPropLoadAndLevel);
+      PIXL_PROP_SVN_CURRENT_REVISION=$(PixlPropSvnCurrentRevision);
+      PIXL_PROP_TARGET_NAME=$(TargetName);
+      PIXL_PROP_TARGET_FILENAME=$(TargetName)$(TargetExt)
+    </PixlPropVersionsMacros>
+    <PixlPropVersionsMacros Condition="'$(PixlPropGitBranch)' != ''">$(PixlPropVersionsMacros);PIXL_PROP_GIT_BRANCH=$(PixlPropGitBranch)</PixlPropVersionsMacros>
+    <PixlPropVersionsMacros Condition="'$(PixlPropGitCommit)' != ''">$(PixlPropVersionsMacros);PIXL_PROP_GIT_COMMIT=$(PixlPropGitCommit)</PixlPropVersionsMacros>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+
+    <!-- Configuration of Visual Studio C++ Compiler -->
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <!--
+        Globally disable these warnings:
+        - warning C4100: 'identifier' : unreferenced formal parameter
+        - warning C4481: nonstandard extension used: override specifier 'keyword'
+        - warning C4512: 'class' : assignment operator could not be generated
+        - warning C4480: nonstandard extension used: specifying underlying type for enum ''
+        - warning C4482: nonstandard extension used: enum 'type' used in qualified name
+      -->
+      <DisableSpecificWarnings>4100;4481;4512;4480;4482</DisableSpecificWarnings>
+
+      <!--
+        Under VS2010, disable this additional warning
+        as VS2010 sometimes report it erroneously (see http://stackoverflow.com/questions/12592865/pure-virtual-inheritance-multiple-inheritance-and-c4505):
+        - warning C4505: 'function' : unreferenced local function has been removed
+      -->
+      <DisableSpecificWarnings Condition="'$(PlatformToolset)' == 'v100'">4505;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+
+      <!--
+        Under VS2015, disable this additional warning
+        as VS2015 sometimes report it erroneously (see https://connect.microsoft.com/VisualStudio/feedback/details/1581706/false-warning-c4589-constructor-of-abstract-class-class2-ignores-initializer-for-virtual-base-class-class1):
+        - warning C4589: Constructor of abstract class 'MFE_OptionalHeaderField' ignores initializer for virtual base class 'MFE_HeaderField'
+      -->
+      <DisableSpecificWarnings Condition="'$(PlatformToolset)' == 'v140'">4589;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader Condition="'$(PixlUsePrecompiledHeader)' != 'False'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(PixlUsePrecompiledHeader)' != 'False'">StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(PixlUsePrecompiledHeader)' != 'False'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AdditionalIncludeDirectories>
+        $(ProjectDir);
+        $(PixlPropSourcePath);
+        $(PixlPropSourcePath)\core;
+        $(PixlPropOutputTlbPath)\$(Configuration);
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(PixlPropIsPublishedPackage)' == 'true'">
+        $(MSBuildThisFileDirectory)..\..\PIXL\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>
+        BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE;
+        _CRT_SECURE_NO_WARNINGS;
+        _SCL_SECURE_NO_WARNINGS;
+        WIN;
+        WIN32;
+        WINNT;
+        _WINDOWS;
+        STRICT;
+        WINVER=0x0501;
+        _WIN32_WINNT=0x0501;
+        _WIN32_WINDOWS=0x0501;
+        WIN32_LEAN_AND_MEAN;
+        PIXL_PROP_ENFORCE_NEW_HEADERS_=2;
+        _WINSOCK_DEPRECATED_NO_WARNINGS;
+        PIXL_PROP_PREPEND_WITH_PACKAGE_DIR_WHEN_IMPORTING_TLB_;
+        $(PixlPropVersionsMacros);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropPlatform)' == 'Win32'">
+        _X86_;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropPlatform)' == 'x64'">
+        _AMD64_;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions>
+        _PIXL_CONFIG_AMD64_DIRTY_BUILD_;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropUseEikanLog)' == 'true'">
+        PIXL_PROP_USE_EIKAN_LOG_;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropUseUpaForValpriceToString)' == 'true'">
+        PIXL_PROP_USE_UPA_FOR_VALPRICE_TOSTRING;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropUsePugixmlOnWindows)' == 'true'">
+        EIKAN_XML_INCLUDE_MSXML=0;EIKAN_XML_DEFAULTS_TO_MSXML=0;
+        EIKAN_XML_INCLUDE_PUGIXML=1;EIKAN_XML_DEFAULTS_TO_PUGIXML=1;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <!-- pascal.menuet: do not use the flag /Wp64 anymore
+         - because it is deprecated by Microsoft
+         - because it generates sometimes some erroneous conversion warnings
+         - because we have an x64 build
+      <AdditionalOptions Condition="'$(Platform)' == 'Win32'">/Wp64 %(AdditionalOptions)</AdditionalOptions>
+    -->
+    </ClCompile>
+
+    <!-- Configuration of Visual Studio Linker -->
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(PixlPropIsPublishedPackage)' == 'true'">
+        $(MSBuildThisFileDirectory)..\..\PIXL\libs\$(Configuration);
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(PixlPropProjectCategory)' == 'FuncTest' or '$(PixlPropProjectCategory)' == 'Sample'">
+        $(PixlPropOutputLibPath)\$(Configuration);
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PixlPropProjectCategory)' == 'FuncTest' or '$(PixlPropProjectCategory)' == 'Sample'">
+        $(PixlPropPixlLibs);%(AdditionalDependencies)
+      </AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <SubSystem Condition="'$(Keyword)' != 'MFCProj' and '$(ConfigurationType)' == 'Application'">Console</SubSystem>
+      <TargetMachine Condition="'$(PixlPropPlatform)' == 'Win32'">MachineX86</TargetMachine>
+      <TargetMachine Condition="'$(PixlPropPlatform)' == 'x64'">MachineX64</TargetMachine>
+    </Link>
+
+    <!-- Configuration of Visual Studio Librarian -->
+    <Lib>
+      <TargetMachine Condition="'$(PixlPropPlatform)' == 'Win32'">MachineX86</TargetMachine>
+      <TargetMachine Condition="'$(PixlPropPlatform)' == 'x64'">MachineX64</TargetMachine>
+    </Lib>
+
+    <!-- Configuration of Visual Studio MIDL -->
+    <Midl>
+      <DefaultCharType>signed</DefaultCharType>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <HeaderFileName>$(PixlPropSourcePublicHeadersPath)\$(ProjectName)\$(ProjectName)_i.h</HeaderFileName>
+      <TypeLibraryName>$(IntDir)$(ProjectName).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>$(ProjectName)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>$(ProjectName)_p.c</ProxyFileName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <TargetEnvironment Condition="'$(PixlPropPlatform)' == 'Win32'">Win32</TargetEnvironment>
+      <TargetEnvironment Condition="'$(PixlPropPlatform)' == 'x64'">X64</TargetEnvironment>
+    </Midl>
+
+    <!-- Configuration of Visual Studio Resource Compilation -->
+    <ResourceCompile>
+      <PreprocessorDefinitions>
+        $(PixlPropVersionsMacros);
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+
+    <!-- Configuration of Visual Studio Manifest Generation -->
+    <Manifest>
+      <AdditionalManifestFiles>%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(PixlPropProjectCategory)' == 'UnitTest'">
+
+    <!-- Configuration of Visual Studio C++ Compiler -->
+    <ClCompile>
+      <!--
+        For unit-tests projects only, globally disable these warnings:
+        - warning C4251: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+    - warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned int', possible loss of data
+        - warning C4275: non–DLL-interface classkey 'identifier' used as base for DLL-interface classkey 'identifier'
+        - warning C4996: 'function': was declared deprecated
+        - warning C4121: 'symbol' : alignment of a member was sensitive to packing
+      -->
+      <DisableSpecificWarnings>4121;4251;4267;4275;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PreprocessorDefinitions>
+        GTEST_LINKED_AS_SHARED_LIBRARY;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(PixlPropUseLibForUnitTests)' == 'true'">
+        PIXL_$(PixlPropUnitTestedProject.ToUpper())_BUILD_;
+        PIXL_CONFIG_USE_LIB_FOR_UNIT_TESTS_;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Platform)' == 'x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+
+    <!-- Configuration of Visual Studio Linker -->
+    <Link>
+      <AdditionalLibraryDirectories>
+        $(PixlPropOutputLibPath)\$(Configuration);
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(PixlPropUseLibForUnitTests)' == 'true'">
+        $(PixlPropOutputObjPath)\$(PixlPropUnitTestedProjectRelativePath)\$(PixlPropUnitTestedProject)\$(Configuration)\out;
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies Condition="'$(PixlPropUseLibForUnitTests)' != 'true' and '$(ConfigurationType)' == 'DynamicLibrary'">
+        $(PixlPropPixlLibs);
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PixlPropUseLibForUnitTests)' == 'true' and Exists('$(PixlPropOutputObjPath)\$(PixlPropUnitTestedProjectRelativePath)\$(PixlPropUnitTestedProject)\$(Configuration)\out\pixl$(PixlPropApiVersion)_$(PixlPropUnitTestedProject)$(PixlPropToolsetVersion).dll.lib-for-ut')">
+        pixl$(PixlPropApiVersion)_$(PixlPropUnitTestedProject)$(PixlPropToolsetVersion).dll.lib-for-ut;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+
+  </ItemDefinitionGroup>
+
+</Project>

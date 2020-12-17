@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_tibcoems_NugetPackageId>tibcoems</NubuProp_tibcoems_NugetPackageId>
+    <NubuProp_tibcoems_NugetPackageVersion>8.1.0.3</NubuProp_tibcoems_NugetPackageVersion>
+    <NubuProp_tibcoems_NugetPackageDllsPath>$(NubuPropNugetPackagesInstallPath)\$(NubuProp_tibcoems_NugetPackageId).$(NubuProp_tibcoems_NugetPackageVersion)\lib\net40</NubuProp_tibcoems_NugetPackageDllsPath>
+  </PropertyGroup>
+  <Import Project="$(NubuPropNugetPackagesInstallPath)\$(NubuProp_tibcoems_NugetPackageId).$(NubuProp_tibcoems_NugetPackageVersion)\build\native\$(NubuProp_tibcoems_NugetPackageId).props" Condition="Exists('$(NubuPropNugetPackagesInstallPath)\$(NubuProp_tibcoems_NugetPackageId).$(NubuProp_tibcoems_NugetPackageVersion)\build\native\$(NubuProp_tibcoems_NugetPackageId).props')" />
+  <ItemGroup>
+    <Reference Include="$(NubuProp_tibcoems_NugetPackageDllsPath)\TIBCO.EMS.dll" />
+  </ItemGroup>
+</Project>

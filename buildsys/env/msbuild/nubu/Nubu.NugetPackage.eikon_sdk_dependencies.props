@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_eikon_sdk_dependencies_NugetPackageId>Eikon.SDK.Dependencies</NubuProp_eikon_sdk_dependencies_NugetPackageId>
+    <NubuProp_eikon_sdk_dependencies_NugetPackageVersion>4.0</NubuProp_eikon_sdk_dependencies_NugetPackageVersion>
+    <NubuProp_eikon_sdk_dependencies_NugetPackageDllsPath>$(NubuPropNugetPackagesInstallPath)\$(NubuProp_eikon_sdk_dependencies_NugetPackageId).$(NubuProp_eikon_sdk_dependencies_NugetPackageVersion)\lib\net40-client</NubuProp_eikon_sdk_dependencies_NugetPackageDllsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(NubuProp_eikon_sdk_dependencies_NugetPackageDllsPath)\Interop.kobra.dll" />
+    <Reference Include="$(NubuProp_eikon_sdk_dependencies_NugetPackageDllsPath)\ThomsonReuters.Container.Integration.dll" />
+    <Reference Include="$(NubuProp_eikon_sdk_dependencies_NugetPackageDllsPath)\TR.EikonBox.Core.dll" />
+  </ItemGroup>
+</Project>

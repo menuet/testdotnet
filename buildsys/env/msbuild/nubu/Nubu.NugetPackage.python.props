@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_python_NugetPackageId>python</NubuProp_python_NugetPackageId>
+    <NubuProp_python_NugetPackageVersion>3.2</NubuProp_python_NugetPackageVersion>
+  </PropertyGroup>
+  <Import Project="$(NubuPropNugetPackagesInstallPath)\$(NubuProp_python_NugetPackageId).$(NubuProp_python_NugetPackageVersion)\build\native\$(NubuProp_python_NugetPackageId).props" Condition="Exists('$(NubuPropNugetPackagesInstallPath)\$(NubuProp_python_NugetPackageId).$(NubuProp_python_NugetPackageVersion)\build\native\$(NubuProp_python_NugetPackageId).props')" />
+</Project>

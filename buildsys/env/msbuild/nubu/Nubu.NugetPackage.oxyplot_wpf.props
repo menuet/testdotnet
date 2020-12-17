@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_oxyplot_wpf_NugetPackageId>OxyPlot.Wpf</NubuProp_oxyplot_wpf_NugetPackageId>
+    <NubuProp_oxyplot_wpf_NugetPackageVersion>2014.1.319.1</NubuProp_oxyplot_wpf_NugetPackageVersion>
+    <NubuProp_oxyplot_wpf_NugetPackageDllsPath>$(NubuPropNugetPackagesInstallPath)\$(NubuProp_oxyplot_wpf_NugetPackageId).$(NubuProp_oxyplot_wpf_NugetPackageVersion)\lib\net40</NubuProp_oxyplot_wpf_NugetPackageDllsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(NubuProp_oxyplot_wpf_NugetPackageDllsPath)\OxyPlot.Wpf.dll" />
+    <Reference Include="$(NubuProp_oxyplot_wpf_NugetPackageDllsPath)\OxyPlot.Xps.dll" />
+  </ItemGroup>
+</Project>

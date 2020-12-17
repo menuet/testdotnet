@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  <PropertyGroup>
+
+    <NubootPropSourcePath Condition="'$(NubootPropSourcePath)' == ''">$(MSBuildThisFileDirectory)</NubootPropSourcePath>
+
+    <NubootPropUnzipPath Condition="'$(NubootPropUnzipPath)' == ''">$(PixlPropOutputPath)\nuboot</NubootPropUnzipPath>
+
+    <NubootPropNubuPackageVersion Condition="'$(NubootPropNubuPackageVersion)' == ''">1.1.0.4</NubootPropNubuPackageVersion>
+
+    <NubootPropPackagesCachePath Condition="'$(NubootPropPackagesCachePath)' == ''">$(PixlPropNugetCachePath)</NubootPropPackagesCachePath>
+
+    <NubootPropPackagesInstallPath Condition="'$(NubootPropPackagesInstallPath)' == ''">$(PixlPropNugetInstallPath)</NubootPropPackagesInstallPath>
+
+    <NubootPropProfileName Condition="'$(NubootPropProfileName)' == ''">pixl</NubootPropProfileName>
+
+    <NubootPropNugetPackagesList Condition="'$(NubootPropNugetPackagesList)' == ''">
+      [boost!1.61.0.1]
+      [eikan!9.0.4000.40]
+      [Eikon.SDK.Dependencies!4.0]
+      [Expression.Blend.Sdk!1.0.2]
+      [googlemock!1.8.0.1]
+      [gsl!0.0.1]
+      [Newtonsoft.Json!6.0.3]
+      [nubu!$(NubootPropNubuPackageVersion)]
+      [OxyPlot.Core!2014.1.319.1]
+      [OxyPlot.Wpf!2014.1.319.1]
+      [pugixml!1.7]
+      [python!3.2]
+      [rapidjson!1.0.2]
+      [rfa!8.0.1.2013]
+      [ThomsonReuters.Desktop.SDK.UI.Signed!1.4.3]
+      [tibcoems!8.1.0.3]
+      [trek!4.0.38.434]
+      [xerces!3.1.2.1]
+    </NubootPropNugetPackagesList>
+
+  </PropertyGroup>
+
+
+</Project>

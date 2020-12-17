@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_pugixml_NugetPackageId>pugixml</NubuProp_pugixml_NugetPackageId>
+    <NubuProp_pugixml_NugetPackageVersion>1.7</NubuProp_pugixml_NugetPackageVersion>
+  </PropertyGroup>
+  <Import Project="$(NubuPropNugetPackagesInstallPath)\$(NubuProp_pugixml_NugetPackageId).$(NubuProp_pugixml_NugetPackageVersion)\build\native\$(NubuProp_pugixml_NugetPackageId).props" Condition="Exists('$(NubuPropNugetPackagesInstallPath)\$(NubuProp_pugixml_NugetPackageId).$(NubuProp_pugixml_NugetPackageVersion)\build\native\$(NubuProp_pugixml_NugetPackageId).props')" />
+</Project>

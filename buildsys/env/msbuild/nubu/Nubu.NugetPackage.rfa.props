@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_rfa_NugetPackageId>rfa</NubuProp_rfa_NugetPackageId>
+    <NubuProp_rfa_NugetPackageVersion>8.0.1.2013</NubuProp_rfa_NugetPackageVersion>
+  </PropertyGroup>
+  <Import Project="$(NubuPropNugetPackagesInstallPath)\$(NubuProp_rfa_NugetPackageId).$(NubuProp_rfa_NugetPackageVersion)\build\native\$(NubuProp_rfa_NugetPackageId).props" Condition="Exists('$(NubuPropNugetPackagesInstallPath)\$(NubuProp_rfa_NugetPackageId).$(NubuProp_rfa_NugetPackageVersion)\build\native\$(NubuProp_rfa_NugetPackageId).props')" />
+</Project>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+
+    <PixlPropUnitTestsResultsFilePath Condition="'$(PixlPropUnitTestsResultsFilePath)' == ''">$(PixlPropRootPath)\UnitTestResults.xml</PixlPropUnitTestsResultsFilePath>
+
+    <PixlPropCommonBuildProperties Condition="'$(PixlPropCommonBuildProperties)' == ''">VisualStudioVersion=$(PixlPropVisualStudioVersion);Platform=$(PixlPropPlatform);PlatformToolset=$(PixlPropToolset)</PixlPropCommonBuildProperties>
+    <PixlPropCommonBuildProperties Condition="'$(PixlPropQualityLevel)' != ''">$(PixlPropCommonBuildProperties);PixlPropQualityLevel=$(PixlPropQualityLevel)</PixlPropCommonBuildProperties>
+    <PixlPropCommonBuildProperties Condition="'$(PixlPropThirdPartyUsagePath)' != ''">$(PixlPropCommonBuildProperties);PixlPropThirdPartyUsagePath=$(PixlPropThirdPartyUsagePath)</PixlPropCommonBuildProperties>
+    <PixlPropCommonBuildProperties Condition="'$(PixlPropUseTsi)' != ''">$(PixlPropCommonBuildProperties);PixlPropUseTsi=$(PixlPropUseTsi)</PixlPropCommonBuildProperties>
+
+    <PixlPropCommonBuildOptions Condition="'$(PixlPropCommonBuildOptions)' == ''">-p:VisualStudioVersion=$(PixlPropVisualStudioVersion) -p:Platform=$(PixlPropPlatform) -p:PlatformToolset=$(PixlPropToolset) -t:Build -maxcpucount -nr:false</PixlPropCommonBuildOptions>
+    <PixlPropCommonBuildOptions Condition="'$(PixlPropQualityLevel)' != ''">$(PixlPropCommonBuildOptions) -p:PixlPropQualityLevel=$(PixlPropQualityLevel)</PixlPropCommonBuildOptions>
+    <PixlPropCommonBuildOptions Condition="'$(PixlPropThirdPartyUsagePath)' != ''">$(PixlPropCommonBuildOptions) -p:PixlPropThirdPartyUsagePath=$(PixlPropThirdPartyUsagePath)</PixlPropCommonBuildOptions>
+    <PixlPropCommonBuildOptions Condition="'$(PixlPropUseTsi)' != ''">$(PixlPropCommonBuildOptions) -p:PixlPropUseTsi=$(PixlPropUseTsi)</PixlPropCommonBuildOptions>
+
+    <PixlPropSvnCommonOptions Condition="'$(PixlPropSvnCommonOptions)' == ''">--no-auth-cache --non-interactive --trust-server-cert</PixlPropSvnCommonOptions>
+    <PixlPropSvnCommonOptions Condition="'$(PixlPropSvnUsername)' != ''">$(PixlPropSvnCommonOptions) "--username=$(PixlPropSvnUsername)"</PixlPropSvnCommonOptions>
+    <PixlPropSvnCommonOptions Condition="'$(PixlPropSvnPassword)' != ''">$(PixlPropSvnCommonOptions) "--password=$(PixlPropSvnPassword)"</PixlPropSvnCommonOptions>
+
+    <PixlPropUnitTestsResultsOptions>--gtest_shuffle "--gtest_output=xml:$(PixlPropUnitTestsResultsFilePath)"</PixlPropUnitTestsResultsOptions>
+
+    <PixlPropFuncTestsRunOptions Condition="'$(PixlPropFuncTestsResultsFilePath)' != ''">$(PixlPropFuncTestsRunOptions) --report "$(PixlPropFuncTestsResultsFilePath)"</PixlPropFuncTestsRunOptions>
+    <PixlPropFuncTestsRunOptions Condition="'$(PixlPropFuncTestsSite)' != ''">$(PixlPropFuncTestsRunOptions) --custom "$(PixlPropFuncTestsSite)"</PixlPropFuncTestsRunOptions>
+    <PixlPropFuncTestsRunOptions Condition="'$(PixlPropFuncTestsTagFilter)' != ''">$(PixlPropFuncTestsRunOptions) --filter "$(PixlPropFuncTestsTagFilter)"</PixlPropFuncTestsRunOptions>
+    <PixlPropFuncTestsRunOptions>$(PixlPropFuncTestsRunOptions) --transform "$(PixlPropSourceFuncTestsPath)\Framework\scripts\run-all.html.xsl" "$(PixlPropRootPath)\FuncTestResults.html" --transform "$(PixlPropSourceFuncTestsPath)\Framework\scripts\run-all.junit.xsl" "$(PixlPropRootPath)\GTestResults.xml"</PixlPropFuncTestsRunOptions>
+
+    <PixlPropPerfTestsRunOptions Condition="'$(PixlPropPerfTestsResultsFilePath)' != ''">$(PixlPropPerfTestsRunOptions) -t "$(PixlPropPerfTestsResultsFilePath)"</PixlPropPerfTestsRunOptions>
+    <PixlPropPerfTestsRunOptions Condition="'$(PixlPropPerfTestsSite)' != ''">$(PixlPropPerfTestsRunOptions) -c "$(PixlPropPerfTestsSite)"</PixlPropPerfTestsRunOptions>
+    <PixlPropPerfTestsRunOptions Condition="'$(PixlPropHtmlResultsFilePath)' != ''">$(PixlPropPerfTestsRunOptions) -j "$(PixlPropHtmlResultsFilePath)"</PixlPropPerfTestsRunOptions>
+
+    <PixlPropPublishRootPath>\\PTXSNBACNAS01.NT.FRANCE.EFFIX.FR\PIXL</PixlPropPublishRootPath>
+    <PixlPropPublishPublicSymbolsPath>$(PixlPropPublishRootPath)\symsrv\public</PixlPropPublishPublicSymbolsPath>
+    <PixlPropPublishPrivateSymbolsPath>$(PixlPropPublishRootPath)\symsrv\private</PixlPropPublishPrivateSymbolsPath>
+
+    <PixlPropPublishLevelPath>$(PixlPropPublishRootPath)\PACKAGING\PIXL\$(PixlPropQualityLevel)</PixlPropPublishLevelPath>
+    <PixlPropPublishPackageLatestPath>$(PixlPropPublishLevelPath)\LATEST</PixlPropPublishPackageLatestPath>
+    <PixlPropPublishPackageBackupPath>$(PixlPropPublishLevelPath)\BACKUP</PixlPropPublishPackageBackupPath>
+    <PixlPropPublishPackageReferencePath>$(PixlPropPublishLevelPath)\REFERENCE</PixlPropPublishPackageReferencePath>
+    <PixlPropPublishKeptBackupedPackages>10</PixlPropPublishKeptBackupedPackages>
+
+    <PixlPropModifyRFADllsManifestsCommand>"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\mt.exe"</PixlPropModifyRFADllsManifestsCommand>
+
+    <PixlPropExportPackagingProgramFolder Condition="'$(PixlPropPlatform)' == 'Win32'">[RdeInstallFolder]\Program</PixlPropExportPackagingProgramFolder>
+    <PixlPropExportPackagingProgramFolder Condition="'$(PixlPropPlatform)' == 'x64'">[RdeProgramInstallFolderx64]</PixlPropExportPackagingProgramFolder>
+
+    <PixlPropExportPackagingWindowsFolder Condition="'$(PixlPropPlatform)' == 'Win32'">[WindowsFolder]\Symbols\dll</PixlPropExportPackagingWindowsFolder>
+    <PixlPropExportPackagingWindowsFolder Condition="'$(PixlPropPlatform)' == 'x64'">[WindowsFolder]\Symbols\dll\x64</PixlPropExportPackagingWindowsFolder>
+
+    <PixlPropExportPackagingConfigFolder Condition="'$(PixlPropPlatform)' == 'Win32'">[RdeConfigFolder]</PixlPropExportPackagingConfigFolder>
+    <PixlPropExportPackagingConfigFolder Condition="'$(PixlPropPlatform)' == 'x64'">[RdeConfigFolderx64]</PixlPropExportPackagingConfigFolder>
+
+    <PixlPropWixSvnUrl Condition="'$(PixlPropWixSvnUrl)' == ''">https://eikonbuildsvn.int.thomsonreuters.com/svn/xtraxdesetup/Eikon_4/Trunk/Compilation-Sandbox/Eikon_4.0</PixlPropWixSvnUrl>
+
+    <PixlPropWixLevel Condition="'$(PixlPropWixLevel)' == '' and ('$(PixlPropQualityLevel)' == 'MAIN' or '$(PixlPropQualityLevel)' == 'BETA')">Main</PixlPropWixLevel>
+    <PixlPropWixLevel Condition="'$(PixlPropWixLevel)' == '' and '$(PixlPropQualityLevel)' == 'RELEASE'">Release</PixlPropWixLevel>
+    <PixlPropWixLevel Condition="'$(PixlPropWixLevel)' == ''">Dev</PixlPropWixLevel>
+
+    <PixlPropWixBranchPrefix Condition="'$(PixlPropWixBranchPrefix)' == ''">$(PixlPropWixLevel)</PixlPropWixBranchPrefix>
+
+    <PixlPropWixBranchSuffix Condition="'$(PixlPropWixBranchSuffix)' == '' and '$(PixlPropQualityLevel)' == 'RELEASE'">\Release_4.0.$(PixlPropLoadNumber)</PixlPropWixBranchSuffix>
+    <PixlPropWixBranchSuffix Condition="'$(PixlPropWixBranchSuffix)' == ''"></PixlPropWixBranchSuffix>
+
+    <PixlPropWixPath>$(PixlPropOutputPkgPath)\WIX</PixlPropWixPath>
+    <PixlPropWixPixlFilesPath>$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)\Gallery\Files\PIXL</PixlPropWixPixlFilesPath>
+    <PixlPropWixPixlConfigPath>$(PixlPropWixPixlFilesPath)\Config</PixlPropWixPixlConfigPath>
+    <PixlPropWixPixlProgramPath>$(PixlPropWixPixlFilesPath)\Bin</PixlPropWixPixlProgramPath>
+    <PixlPropWixPixlProgramPath Condition="'$(PixlPropPlatform)' == 'x64'">$(PixlPropWixPixlFilesPath)\Bin (x64)</PixlPropWixPixlProgramPath>
+    <PixlPropWixPixlSymbolsPath>$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)-Symbols\Gallery\Symbols-Files\PIXL</PixlPropWixPixlSymbolsPath>
+    <PixlPropWixPixlSymbolsPath Condition="'$(PixlPropPlatform)' == 'x64'">$(PixlPropWixPath)\$(PixlPropWixBranchPrefix)$(PixlPropWixBranchSuffix)-Symbols\Gallery\Symbols-Files_x64\PIXL</PixlPropWixPixlSymbolsPath>
+
+    <PixlPropEssFtpHost Condition="'$(PixlPropEssFtpHost)' == ''">epr-servant.emea1.cis.trcloud</PixlPropEssFtpHost>
+    <PixlPropEssFtpPort Condition="'$(PixlPropEssFtpPort)' == ''">21</PixlPropEssFtpPort>
+    <PixlPropEssFtpUser Condition="'$(PixlPropEssFtpUser)' == ''">ftpuser</PixlPropEssFtpUser>
+    <PixlPropEssFtpPass Condition="'$(PixlPropEssFtpPass)' == ''">Secret12</PixlPropEssFtpPass>
+    <PixlPropEssFtpRemoteDirectory Condition="'$(PixlPropEssFtpRemoteDirectory)' == ''">/Replayer/$(Platform)/</PixlPropEssFtpRemoteDirectory>
+
+  </PropertyGroup>
+
+</Project>

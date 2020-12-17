@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageId>ThomsonReuters.Desktop.SDK.UI.Signed</NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageId>
+    <NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageVersion>1.4.3</NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageVersion>
+    <NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageDllsPath>$(NubuPropNugetPackagesInstallPath)\$(NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageId).$(NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageVersion)\lib\net40-client</NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageDllsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(NubuProp_thomsonreuters_desktop_sdk_ui_signed_NugetPackageDllsPath)\ThomsonReuters.Desktop.SDK.UI.dll" />
+  </ItemGroup>
+</Project>

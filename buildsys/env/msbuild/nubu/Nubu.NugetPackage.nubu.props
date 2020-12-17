@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NubuProp_nubu_NugetPackageId>nubu</NubuProp_nubu_NugetPackageId>
+    <NubuProp_nubu_NugetPackageVersion>1.1.0.4</NubuProp_nubu_NugetPackageVersion>
+  </PropertyGroup>
+  <Import Project="$(NubuPropNugetPackagesInstallPath)\$(NubuProp_nubu_NugetPackageId).$(NubuProp_nubu_NugetPackageVersion)\build\native\$(NubuProp_nubu_NugetPackageId).props" Condition="Exists('$(NubuPropNugetPackagesInstallPath)\$(NubuProp_nubu_NugetPackageId).$(NubuProp_nubu_NugetPackageVersion)\build\native\$(NubuProp_nubu_NugetPackageId).props')" />
+</Project>
